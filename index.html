@@ -754,7 +754,6 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 <script>
 var parts=JSON.parse(localStorage.getItem('bx_parts')||'[]');
 var nextId=parseInt(localStorage.getItem('bx_nextId')||'1');
-var nextId=197;
 var decks=JSON.parse(localStorage.getItem('bx_decks')||'[]');
 var nextDeckId=parseInt(localStorage.getItem('bx_nextDeckId')||'1');
 var renameDeckId=null;
@@ -2600,7 +2599,7 @@ function setCxSubTab(t){cxSubTab=t;renderParts();}
 function chgQty(id,d){
   var p=parts.find(function(x){return x.id===id;});if(!p)return;
   p.qty=Math.max(0,p.qty+d);
-  document.getElementById('qty-'+id).textContent=p.qty;renderStats();
+  document.getElementById('qty-'+id).textContent=p.qty;renderStats();saveParts();
 }
 var editPartId=null;
 var editThumbData=null;
@@ -2657,11 +2656,12 @@ function saveEditPart(){
   if(!p)return;
   p.img=editThumbData;
   p.memo=document.getElementById('edit-memo-inp').value.trim();
+  saveParts();
   closeModal('modal-edit-part');
   renderParts();
 }
 
-function delPart(id){parts=parts.filter(function(x){return x.id!==id;});renderParts();}
+function delPart(id){parts=parts.filter(function(x){return x.id!==id;});saveParts();renderParts();}
 
 // ADD PART
 function mkBxuxRow(i){
@@ -3033,6 +3033,7 @@ function addPickerDone(){
 
   if(!added.length){showToast('パーツを選択してください');return;}
   parts.push.apply(parts,added);
+  saveParts();
   closeModal('modal-add-picker');
   showToast(added.length+'件登録しました','ok');
   renderParts();
@@ -3646,12 +3647,19 @@ function saveDeck(){
     bit:DS.combo?null:DS.bit,
     combo:DS.combo||null,
   });
+  saveDecks();
   closeModal('modal-deck');
   renderDecks();
 }
 
 renderHome();
 showScreen('home');
+
+// ページ離脱時の保険として保存
+window.addEventListener('beforeunload', function(){
+  saveParts();
+  saveDecks();
+});
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
