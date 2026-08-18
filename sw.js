@@ -1,25 +1,25 @@
 // BEYBLADE X Manager - Service Worker
-const CACHE_NAME = 'bx-manager-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
+const CACHE_NAME = 'bx-manager-v3';
+const STATIC_ASSETS = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/icon-180.png',
 ];
 
-// インストール：アセットをキャッシュ
+// インストール：アイコン等の静的アセットだけキャッシュ
+// index.htmlはキャッシュしない（常に最新を取得するため）
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
+      return cache.addAll(STATIC_ASSETS);
     }).then(function() {
       return self.skipWaiting();
     })
   );
 });
 
-// アクティベート：古いキャッシュを削除
+// アクティベート：古いキャッシュを全削除
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(keys) {
@@ -36,16 +36,31 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-// フェッチ：キャッシュファースト戦略
+// フェッチ：index.htmlは常にネットワークから取得（ネットワークファースト）
+// アイコン等の静的ファイルはキャッシュファースト
 self.addEventListener('fetch', function(event) {
-  // chrome-extension等は無視
   if (!event.request.url.startsWith('http')) return;
 
+  var url = new URL(event.request.url);
+
+  // index.html と / はネットワークファースト（常に最新を取得）
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request).then(function(response) {
+        return response;
+      }).catch(function() {
+        // オフライン時のみキャッシュから返す
+        return caches.match('/index.html');
+      })
+    );
+    return;
+  }
+
+  // アイコン・manifest等はキャッシュファースト
   event.respondWith(
     caches.match(event.request).then(function(cached) {
       if (cached) return cached;
       return fetch(event.request).then(function(response) {
-        // 成功レスポンスのみキャッシュ
         if (response && response.status === 200 && response.type === 'basic') {
           var responseClone = response.clone();
           caches.open(CACHE_NAME).then(function(cache) {
@@ -54,7 +69,6 @@ self.addEventListener('fetch', function(event) {
         }
         return response;
       }).catch(function() {
-        // オフライン時はindex.htmlを返す
         return caches.match('/index.html');
       });
     })
