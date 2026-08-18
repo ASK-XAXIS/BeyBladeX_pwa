@@ -1,7 +1,7 @@
 {
-  "name": "BEYBLADE X パーツ管理",
+  "name": "スピナー パーツ管理",
   "short_name": "BX Manager",
-  "description": "ベイブレードXのパーツ管理・デッキ構築・対戦記録・計測アプリ",
+  "description": "パーツ管理・デッキ構築・対戦記録・計測アプリ",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
