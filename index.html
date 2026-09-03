@@ -368,9 +368,6 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 </style>
 </head>
 <body>
-  /**
-  * ナビゲーション
-  */  
 <div class="nav">
   <button class="nav-btn active" onclick="checkNavSwitch('home')" id="nav-home"><i class="ti ti-home"></i>ホーム</button>
   <button class="nav-btn" onclick="checkNavSwitch('parts')" id="nav-parts"><i class="ti ti-layout-grid"></i>パーツ</button>
@@ -1503,13 +1500,14 @@ function registerAndSaveTimer(){
   });
 
   decks.push(newDeck);
+  saveDecks();
   timerDeck.deckId=newDeck.id;
 
 /*未所持パーツの抽出*/
 var deckPartNames = getDeckPartsText(p)
 .split(' / ')
 .filter(function(name){return name.trim() !== '';});
-var unownedParts = deckPartNames.filter(function(name){
+var unownedNames = deckPartNames.filter(function(name){
   return !parts.some(function(owned){
     return owned.name === name;
   });
