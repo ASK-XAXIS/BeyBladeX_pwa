@@ -1,0 +1,23 @@
+# Windows
+NTUSER.DAT*
+ntuser.dat*
+ntuser.ini
+desktop.ini
+
+# ユーザーフォルダ系
+../../../../*
+../../../*
+../../*
+../*
+
+# 開発ファイル
+node_modules/
+.vscode/
+*.lnk
+*.url
+
+# 個人ファイル
+AppData/
+Documents/
+Downloads/
+AndroidStudioProjects/
