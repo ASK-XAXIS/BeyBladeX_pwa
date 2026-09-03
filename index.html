@@ -52,6 +52,9 @@
     --card-shadow:0 2px 8px rgba(0,0,0,0.08);
   }
 }
+/**
+  * 共通スタイル
+  */
 body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);font-size:14px;max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:calc(60px + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top);}
 .nav{padding-bottom:env(safe-area-inset-bottom);}
 .nav{display:flex;background:var(--nav-bg);border-top:0.5px solid var(--nav-border);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:50;}
@@ -178,6 +181,9 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   50%{transform:scale(1.15);opacity:1;}
   100%{transform:scale(1);opacity:1;}
 }
+/**
+  * タイマー
+  */
 .countdown-label{font-size:13px;color:var(--text2);margin-top:16px;letter-spacing:0.1em;}
 .timer-main{font-size:72px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1;}
 .timer-ms{font-size:32px;color:var(--text2);font-variant-numeric:tabular-nums;}
@@ -339,7 +345,9 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 .grid-unowned-badge{font-size:6.5px;color:var(--warn);margin-top:-1px;}
 
 .name-hint{font-size:10px;color:var(--text2);padding:4px 8px;background:var(--bg3);border-radius:6px;margin-top:4px;}
-
+/**
+  * パーツ選択UI
+  */
 .part-sel-display{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;margin-bottom:2px;}
 .part-sel-display:hover{border-color:var(--accent);}
 .part-sel-placeholder{font-size:12px;color:var(--text3);}
@@ -360,6 +368,9 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 </style>
 </head>
 <body>
+  /**
+  * ナビゲーション
+  */  
 <div class="nav">
   <button class="nav-btn active" onclick="checkNavSwitch('home')" id="nav-home"><i class="ti ti-home"></i>ホーム</button>
   <button class="nav-btn" onclick="checkNavSwitch('parts')" id="nav-parts"><i class="ti ti-layout-grid"></i>パーツ</button>
@@ -626,6 +637,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
       </div>
     </div>
 
+    <!-- 所持数・メモ -->
     <div id="missing-warn" style="display:none;" class="missing-warn"><i class="ti ti-alert-triangle"></i>未所持のパーツあり</div>
     <div id="otype-warn" style="display:none;color:var(--danger);font-size:10px;margin-bottom:8px;align-items:center;gap:4px;"><i class="ti ti-alert-triangle"></i>O型専用ブレードには通常ラチェット使用不可</div>
 
@@ -698,7 +710,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- CONFIRM NAV MODAL -->
+<!-- CONFIRM NAVIGATION MODAL -->
 <div class="modal-overlay hidden" id="modal-confirm-nav">
   <div class="modal" style="max-height:40vh;">
     <h3 style="margin-bottom:12px;">ページを移動しますか？</h3>
@@ -752,12 +764,16 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 <div class="toast" id="toast"></div>
 
 <script>
+  /**
+   * データの初期化
+   */
 var parts=JSON.parse(localStorage.getItem('bx_parts')||'[]');
 var nextId=parseInt(localStorage.getItem('bx_nextId')||'1');
 var decks=JSON.parse(localStorage.getItem('bx_decks')||'[]');
 var nextDeckId=parseInt(localStorage.getItem('bx_nextDeckId')||'1');
 var renameDeckId=null;
 
+// パーツデータベース
 var ALL_DB=[
   {name:'ドランソード',cat:'blade',line:'bx'},
   {name:'ヘルズサイズ',cat:'blade',line:'bx'},
@@ -808,7 +824,7 @@ var ALL_DB=[
   {name:'ゼノエクスカリバー',cat:'blade',line:'bx'},
   {name:'ストームスプリガン',cat:'blade',line:'bx'},
   {name:'アイアンマン',cat:'blade',line:'bx'},
-　{name:'サノス',cat:'blade',line:'bx'},
+  {name:'サノス',cat:'blade',line:'bx'},
   {name:'スパイダーマン',cat:'blade',line:'bx'},
   {name:'ヴェノム',cat:'blade',line:'bx'},
   {name:'ルーク・スカイウォーカー',cat:'blade',line:'bx'},
@@ -984,12 +1000,17 @@ var ALL_DB=[
   {name:'Op（オペレート）',cat:'combo',combotype:'Op'}
 ];
 
+/*各種定数*/
+/*定数名={key:値}*/
 var LINE={bx:'BX',ux:'UX',cx:'CX'};
 var CXLBL={lock:'ロックチップ',main:'メインブレード',assist:'アシストブレード',metal:'メタルブレード',over:'オーバーブレード'};
 var CATLBL={blade:'ブレード',ratchet:'ラチェット',bit:'ビット',combo:'一体型ビット'};
 var EMO={blade:'⚔️',ratchet:'🔩',bit:'🔵',combo:'💠'};
 var RTLBL={normal:'通常',otype:'O型'};
 
+/**
+ * グローバル変数
+ */
 var mainTab='all',bladeSubTab='all',cxSubTab='lock';
 var thumbTarget=null,thumbMap={},cxAddPat=3;
 var rowCount={bxux:1,ratchet:1,bit:1,combo:1};
@@ -997,19 +1018,31 @@ var deckMode='owned',deckBladeLine='bx',deckCxPat=3;
 var DS={blade:null,lock:null,main:null,assist:null,metal:null,over:null,lock4:null,assist4:null,ratchet:null,bit:null,combo:null};
 var userEditedName=false;
 
+/**
+ * ユーティリティ関数
+ */
 function showToast(msg,type){
   var t=document.getElementById('toast');
   t.textContent=msg;t.className='toast '+(type||'');
   t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2800);
 }
+
+/**
+ * モーダルの表示・非表示
+ */
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 var pendingNavTarget=null;
 
+/**
+ * ナビゲーション切り替え時の入力内容確認
+ */
 function checkNavSwitch(name){
   // Check if any input/modal has content
   var hasInput=false;
 
-  // Check add-part-picker modal
+  /**
+   * Check add picker modal
+   */
   var addPickerModal=document.getElementById('modal-add-picker');
   if(addPickerModal&&!addPickerModal.classList.contains('hidden')){
     var hasChecked=false;
@@ -1035,6 +1068,9 @@ function checkNavSwitch(name){
     if(hasP) hasInput=true;
   }
 
+  /**
+   * Check picker modal (parts)
+   */
   if(hasInput){
     pendingNavTarget=name;
     document.getElementById('modal-confirm-nav').classList.remove('hidden');
@@ -1048,6 +1084,9 @@ function checkNavSwitch(name){
   }
 }
 
+/**
+ * Confirm navigation modal actions
+ */
 function confirmNavYes(){
   document.getElementById('modal-confirm-nav').classList.add('hidden');
   // Close all modals
@@ -1055,7 +1094,10 @@ function confirmNavYes(){
     var el=document.getElementById(id);
     if(el) el.classList.add('hidden');
   });
-  // Reset states
+
+  /**
+   * Reset temporary data
+   */
   addPickerTemp={};
   DS={bladeLine:null,cxPat:3,blade:null,lock:null,main:null,assist:null,lock4:null,metal:null,over:null,assist4:null,ratchet:null,bit:null,combo:null};
   pickerTemp={};
@@ -1065,10 +1107,14 @@ function confirmNavYes(){
   }
 }
 
+/**
+ * Cancel navigation modal
+ */
 function confirmNavNo(){
   document.getElementById('modal-confirm-nav').classList.add('hidden');
   pendingNavTarget=null;
 }
+
 
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
@@ -1111,6 +1157,9 @@ function fmtTimeDuration(ms){
   return '持久力 '+fmtTimeSec(ms)+' 秒';
 }
 
+/**
+ * 計測モードホーム画面
+ */
 function renderTimerHome(){
   timerState='home';
   timerDeck=null;
@@ -1138,12 +1187,18 @@ function renderTimerHome(){
     +'</div>';
 }
 
+/**
+ * 計測モード：デッキ選択画面
+ */
 function startTimerSelect(mode){
   timerSelectMode=mode;
   timerState='select';
   var html='<div style="padding:0 0 80px;">';
   html+='<div style="padding:8px 16px;"><button class="btn-sm" onclick="renderTimerHome()" style="padding:6px 12px;"><i class="ti ti-arrow-left"></i> 戻る</button></div>';
 
+  /**
+   * デッキ選択モードによって表示を切り替える
+   */
   if(mode==='saved'){
     html+='<div style="padding:0 16px 8px;font-size:11px;color:var(--text2);">マイデッキを選択</div>';
     if(!decks.length){
@@ -1392,7 +1447,15 @@ function renderTimerResult(){
     +'</div>';
 
   // マイデッキ登録済みか確認
+  /**
+   * timerDeck.deckId が存在する場合、decks 配列から対応するデッキを検索し、matchedDeck に格納します。
+   */
   var matchedDeck=timerDeck.deckId?decks.find(function(d){return d.id===timerDeck.deckId;}):null;
+
+  /**
+   * matchedDeck が存在する場合、計測結果を登録するかどうかの確認メッセージとボタンを表示します。
+   * matchedDeck が存在しない場合、デッキがマイデッキに登録されていないことを示すメッセージと、登録して計測結果を保存するかどうかの確認ボタンを表示します。
+   */
   if(matchedDeck){
     html+='<div style="padding:0 16px;">'
       +'<p style="font-size:13px;color:var(--text);margin-bottom:12px;">この計測結果を「'+matchedDeck.name+'」に登録しますか？</p>'
@@ -1410,6 +1473,9 @@ function renderTimerResult(){
       +'</div>'
       +'</div>';
   }
+  /**
+   * 計測結果の詳細を表示するためのHTMLを生成します。ラップタイムが存在する場合、ラップタイムのリストを表示します。
+   */
   html+='</div>';
   document.getElementById('timer-content').innerHTML=html;
 }
@@ -1430,9 +1496,49 @@ function saveTimerResult(deckId){
 function registerAndSaveTimer(){
   // デッキをマイデッキに登録
   var p=timerDeck.parts;
-  var newDeck=Object.assign({},p,{id:nextDeckId++,name:timerDeck.name,battle:false});
+  var newDeck = Object.assign({},p,{
+    id:nextDeckId++,
+    name:timerDeck.name,
+    battle:false
+  });
+
   decks.push(newDeck);
   timerDeck.deckId=newDeck.id;
+
+/*未所持パーツの抽出*/
+var deckPartNames = getDeckPartsText(p)
+.split(' / ')
+.filter(function(name){return name.trim() !== '';});
+var unownedParts = deckPartNames.filter(function(name){
+  return !parts.some(function(owned){
+    return owned.name === name;
+  });
+});
+
+ // 未所持パーツがあれば確認
+  if(unownedNames.length > 0){
+    var msg = '以下のパーツが未登録です。所持パーツに追加しますか？\n\n'
+      + unownedNames.join('\n');
+
+       if(confirm(msg)){
+      // 未所持パーツをpartsに追加
+      unownedNames.forEach(function(name){
+        // ALL_DBから該当パーツを探す
+        var dbItem = ALL_DB.find(function(item){ return item.name === name; });
+        if(dbItem){
+          parts.push(Object.assign({}, dbItem, {
+            id: nextId++,
+            qty: 1,
+            memo: '',
+            img: null
+          }));
+        }
+      });
+      saveParts();
+      showToast(unownedNames.length + '件のパーツを登録しました', 'ok');
+    }
+  }
+
   saveTimerResult(newDeck.id);
   renderDecks();
 }
