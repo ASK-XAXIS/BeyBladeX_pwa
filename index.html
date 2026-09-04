@@ -1230,7 +1230,7 @@ function startTimerSelect(mode){
       html+=decks.map(function(d){
         return '<div class="timer-deck-card" onclick="selectTimerDeck('+d.id+',\'saved\')" style="margin:0 16px 8px;">'
           +'<div style="font-size:13px;font-weight:500;margin-bottom:4px;">'+d.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text2);">'+getDeckPartsText(d)+'</div>'
+          +'<div style="font-size:10px;color:var(--text2);">'+getAllNames(d).join(' / ')+'</div>'
           +'</div>';
       }).join('');
     }
@@ -1333,7 +1333,7 @@ function renderTimerStandby(){
     +'<div style="padding:12px 16px;background:var(--bg2);margin:0 16px 14px;border-radius:12px;border:0.5px solid var(--border);">'
       +'<div style="font-size:10px;color:var(--text2);margin-bottom:4px;">計測対象</div>'
       +'<div style="font-size:15px;font-weight:600;">'+timerDeck.name+'</div>'
-      +'<div style="font-size:10px;color:var(--text2);margin-top:3px;">'+getDeckPartsText(timerDeck.parts)+'</div>'
+      +'<div style="font-size:10px;color:var(--text2);margin-top:3px;">'+getAllNames(timerDeck.parts).join(' / ')+'</div>'
     +'</div>'
     +'<div class="timer-display">'
       +'<div><span class="timer-main">0:00</span><span class="timer-ms">.00</span></div>'
@@ -1530,9 +1530,8 @@ function registerAndSaveTimer(){
   timerDeck.deckId=newDeck.id;
 
 /*未所持パーツの抽出*/
-var deckPartNames = getDeckPartsText(p)
-.split(' / ')
-.filter(function(name){return name.trim() !== '';});
+var deckPartNames = getAllNames(p)
+  .filter(function(name){return name.trim() !== '';});
 var unownedNames = deckPartNames.filter(function(name){
   return !parts.some(function(owned){
     return owned.name === name;
@@ -1932,7 +1931,7 @@ function renderDeckSelectSlot(side,idx){
   if(deck.parts){
     html+='<div class="deck-chosen-display">'
       +'<div style="font-size:13px;font-weight:500;">'+deck.name+'</div>'
-      +'<div class="deck-chosen-parts">'+getDeckPartsText(deck.parts)+'</div>'
+      +'<div class="deck-chosen-parts">'+getAllNames(deck.parts).join(' / ')+'</div>'
       +dupeWarn
       +'<button class="btn-sm" onclick="clearDeckSlot(\''+side+'\','+idx+')" style="font-size:10px;padding:3px 8px;margin-top:6px;">変更</button>'
       +'</div>';
@@ -2129,12 +2128,12 @@ function renderBattleArena(){
     +'<div style="background:var(--bg2);border-radius:8px;padding:8px;border:0.5px solid var(--border);">'
       +'<div style="font-size:9px;color:var(--text3);">'+myPlayerName+'のデッキ</div>'
       +'<div style="font-size:12px;font-weight:500;margin-top:2px;">'+myDeck.name+'</div>'
-      +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getDeckPartsText(myDeck.parts)+'</div>'
+      +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getAllNames(myDeck.parts).join(' / ')+'</div>'
     +'</div>'
     +'<div style="background:var(--bg2);border-radius:8px;padding:8px;border:0.5px solid var(--border);">'
       +'<div style="font-size:9px;color:var(--text3);">'+BS.oppName+'のデッキ</div>'
       +'<div style="font-size:12px;font-weight:500;margin-top:2px;">'+oppDeck.name+'</div>'
-      +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getDeckPartsText(oppDeck.parts)+'</div>'
+      +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getAllNames(oppDeck.parts).join(' / ')+'</div>'
     +'</div>'
     +'</div>';
 
@@ -2278,7 +2277,7 @@ function renderUnregDeckPrompts(){
       html+='<div class="unreg-deck-card">'
         +'<div class="unreg-deck-title"><i class="ti ti-alert-circle"></i>未登録のデッキがあります</div>'
         +'<div class="unreg-deck-name">'+d.name+'</div>'
-        +'<div class="unreg-deck-parts">'+getDeckPartsText(d.parts)+'</div>'
+        +'<div class="unreg-deck-parts">'+getAllNames(d.parts).join(' / ')+'</div>'
         +'<div style="display:flex;gap:8px;margin-top:10px;">'
           +'<button class="btn-save" onclick="registerTempDeck(\'my\','+i+')" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;cursor:pointer;">登録する</button>'
           +'<button class="btn-sm" onclick="discardTempDeck(\'my\','+i+')" style="flex:1;padding:9px;text-align:center;font-size:12px;">いいえ</button>'
@@ -2291,7 +2290,7 @@ function renderUnregDeckPrompts(){
       html+='<div class="unreg-deck-card">'
         +'<div class="unreg-deck-title"><i class="ti ti-alert-circle"></i>'+BS.oppName+'の未登録デッキ</div>'
         +'<div class="unreg-deck-name">'+d.name+'</div>'
-        +'<div class="unreg-deck-parts">'+getDeckPartsText(d.parts)+'</div>'
+        +'<div class="unreg-deck-parts">'+getAllNames(d.parts).join(' / ')+'</div>'
         +'<div style="display:flex;gap:8px;margin-top:10px;">'
           +'<button class="btn-save" onclick="registerTempDeck(\'opp\','+i+')" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:12px;cursor:pointer;">登録する</button>'
           +'<button class="btn-sm" onclick="discardTempDeck(\'opp\','+i+')" style="flex:1;padding:9px;text-align:center;font-size:12px;">いいえ</button>'
@@ -2378,7 +2377,7 @@ function renderHome(){
       rdEl.innerHTML=recentDecks.map(function(d){
         return '<div class="home-recent-deck">'
           +'<div class="home-recent-deck-name">'+d.name+'</div>'
-          +'<div class="home-recent-deck-parts">'+getDeckPartsText(d)+'</div>'
+          +'<div class="home-recent-deck-parts">'+getAllNames(d).join(' / ')+'</div>'
           +'</div>';
       }).join('');
     }
