@@ -12,9 +12,10 @@
 <meta name="theme-color" content="#00cc44">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<!--CSS (デザイン全部)-->
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-/* ===== ダークテーマ（デフォルト） ===== */
+/* ===== ダークテーマ配色 ===== */
 :root{
   --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;
   --border:rgba(120,100,255,0.15);--border2:rgba(120,100,255,0.3);
@@ -26,7 +27,7 @@
   --nav-bg:#0a0a0f;--nav-border:rgba(0,204,68,0.3);
   --card-shadow:none;
 }
-/* ===== ライトテーマ ===== */
+/* ===== ライトテーマ配色 ===== */
 [data-theme="light"]{
   --bg:#f0f0f0;--bg2:#ffffff;--bg3:#f5f5f5;
   --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.2);
@@ -38,7 +39,7 @@
   --nav-bg:#111111;--nav-border:rgba(0,204,68,0.5);
   --card-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
-/* ===== システム設定連動 ===== */
+/* ===== デフォルトテーマ 配色===== */
 @media(prefers-color-scheme:light){
   :root:not([data-theme="dark"]){
     --bg:#f0f0f0;--bg2:#ffffff;--bg3:#f5f5f5;
@@ -135,8 +136,19 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 .btn-sm.success{background:rgba(76,175,130,0.15);border-color:var(--success);color:var(--success);}
 .btn-sm.danger{background:rgba(255,92,92,0.1);border-color:rgba(255,92,92,0.3);color:var(--danger);}
 .missing-warn{font-size:10px;color:var(--warn);margin-bottom:8px;display:flex;align-items:center;gap:4px;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;z-index:200;}
-.modal-overlay.hidden{display:none;}
+/* モーダル (書き方例メモしてます)*/
+.modal-overlay{
+  position:fixed; /*表示場所：画面全体を覆う*/
+  inset:0; /*開始地点：上下左右0px(全面)*/
+  background:rgba(0,0,0,0.75); /*背景色:黒色、透明度0.75*/
+  display:flex; /*子要素の並べ方：横並び*/
+  align-items:flex-end; /*ポップアップをしたから出す*/
+  justify-content:center; /*親要素に対しての配置場所：center(真ん中)*/
+  z-index:200; /*z軸（奥行き）:最前面（0が一番奥）*/
+}
+.modal-overlay.hidden{
+  display:none; /*hiddenクラスで非表示にする*/
+}
 .modal{background:var(--bg2);border-radius:16px 16px 0 0;border:0.5px solid var(--border);padding:20px;width:100%;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .modal h3{font-size:14px;font-weight:500;margin-bottom:10px;}
 .form-label{font-size:11px;color:var(--text2);margin-bottom:4px;margin-top:12px;display:block;}
@@ -368,6 +380,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
 </style>
 </head>
 <body>
+  <!--下部タブ-->
 <div class="nav">
   <button class="nav-btn active" onclick="checkNavSwitch('home')" id="nav-home"><i class="ti ti-home"></i>ホーム</button>
   <button class="nav-btn" onclick="checkNavSwitch('parts')" id="nav-parts"><i class="ti ti-layout-grid"></i>パーツ</button>
@@ -376,6 +389,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   <button class="nav-btn" onclick="checkNavSwitch('timer')" id="nav-timer"><i class="ti ti-stopwatch"></i>計測</button>
 </div>
 
+<!-- ホーム画面 -->
 <div class="screen active" id="screen-home">
   <div style="background:var(--nav-bg);padding:14px 16px 10px;position:relative;overflow:hidden;">
     <!-- X字背景 -->
@@ -456,6 +470,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
+<!-- パーツ管理画面 -->
 <div class="screen" id="screen-parts">
   <div style="background:var(--nav-bg);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
     <div>
@@ -476,6 +491,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   <div class="parts-list" id="parts-list"></div>
 </div>
 
+<!-- デッキ管理画面 -->
 <div class="screen" id="screen-decks">
   <div style="background:var(--nav-bg);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
     <div>
@@ -487,6 +503,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   <div class="deck-list" id="deck-list"></div>
 </div>
 
+<!-- 計測モード画面 -->
 <div class="screen" id="screen-timer">
   <div style="background:var(--nav-bg);padding:14px 16px 10px;">
     <div style="font-size:10px;color:#888;letter-spacing:0.08em;">スピナー</div>
@@ -495,13 +512,14 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   <div id="timer-content"></div>
 </div>
 
+<!-- 対戦モード画面 -->
 <div class="screen" id="screen-battle">
   <div class="top-bar"><h2 id="battle-screen-title">対戦モード</h2></div>
   <div id="battle-content"></div>
 </div>
 
 
-<!-- ADD PART MODAL -->
+<!-- パーツ追加モーダル -->
 <div class="modal-overlay hidden" id="modal-part">
   <div class="modal">
     <h3>パーツを追加</h3>
@@ -536,7 +554,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- ADD PART PICKER MODAL -->
+<!-- パーツ追加ピッカー -->
 <div class="modal-overlay hidden" id="modal-add-picker">
   <div class="modal">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
@@ -588,7 +606,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- ADD DECK MODAL -->
+<!-- デッキ作成モーダル -->
 <div class="modal-overlay hidden" id="modal-deck">
   <div class="modal">
     <h3>デッキを作成</h3>
@@ -682,7 +700,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- EDIT PART MODAL -->
+<!-- ポップアップ画面 -->
 <div class="modal-overlay hidden" id="modal-edit-part">
   <div class="modal">
     <h3>パーツを編集</h3>
@@ -707,7 +725,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- CONFIRM NAVIGATION MODAL -->
+<!-- 確認ナビゲーションモーダル -->
 <div class="modal-overlay hidden" id="modal-confirm-nav">
   <div class="modal" style="max-height:40vh;">
     <h3 style="margin-bottom:12px;">ページを移動しますか？</h3>
@@ -719,7 +737,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- RENAME MODAL -->
+<!-- デッキ名変更モーダル -->
 <div class="modal-overlay hidden" id="modal-rename">
   <div class="modal" style="max-height:50vh;">
     <h3>デッキ名を変更</h3>
@@ -732,7 +750,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- BATTLE DECK PICKER MODAL -->
+<!-- デッキ選択モーダル -->
 <div class="modal-overlay hidden" id="modal-battle-deck">
   <div class="modal">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
@@ -746,7 +764,7 @@ body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);fo
   </div>
 </div>
 
-<!-- DELETE CONFIRM MODAL -->
+<!-- 削除確認モーダル -->
 <div class="modal-overlay hidden" id="modal-del-part">
   <div class="modal" style="max-height:40vh;">
     <h3 style="margin-bottom:10px;">パーツを削除</h3>
@@ -1025,7 +1043,7 @@ function showToast(msg,type){
 }
 
 /**
- * モーダルの表示・非表示
+ * モーダルの非表示化（閉じる）
  */
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 var pendingNavTarget=null;
@@ -1113,11 +1131,19 @@ function confirmNavNo(){
 }
 
 
+//画面切替え用関数
 function showScreen(name){
+  //全画面のactiveを外す
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+
+  //全ナビゲーションボタンのactiveを外す
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+
+  //指定した画面だけactiveをつける
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
+
+  //画面ごとの描画関数を呼ぶ
   if(name==='home')renderHome();
   if(name==='parts')renderParts();
   if(name==='decks')renderDecks();
@@ -1882,7 +1908,21 @@ function renderBattleSetup(){
 
 function renderDeckSelectSlot(side,idx){
   var deck=(side==='my'?BS.myDecks:BS.oppDecks)[idx];
+  var arr=(side==='my'?BS.myDecks:BS.oppDecks);
   var label=(BS.ruleDeckCount>1?'デッキ '+(idx+1):'デッキ');
+
+  // 重複チェック（デッキが選択済みの場合のみ）
+  var dupeWarn='';
+  if(deck.parts){
+    var names=getAllNames(deck.parts);
+    var dupInfo=checkDeckDupe(arr,idx,names);
+    if(dupInfo){
+      dupeWarn='<div style="color:var(--danger);font-size:11px;margin-top:6px;">'
+        +'⚠️ デッキ'+dupInfo.deckNum+'と重複：'+dupInfo.parts.join(', ')
+        +'</div>';
+    }
+  }
+
   var html='<div class="deck-select-slot" id="slot-'+side+'-'+idx+'">'
     +'<div class="deck-slot-label">'+label+'</div>'
     +'<div class="deck-slot-choice">'
@@ -1893,26 +1933,12 @@ function renderDeckSelectSlot(side,idx){
     html+='<div class="deck-chosen-display">'
       +'<div style="font-size:13px;font-weight:500;">'+deck.name+'</div>'
       +'<div class="deck-chosen-parts">'+getDeckPartsText(deck.parts)+'</div>'
+      +dupeWarn
       +'<button class="btn-sm" onclick="clearDeckSlot(\''+side+'\','+idx+')" style="font-size:10px;padding:3px 8px;margin-top:6px;">変更</button>'
       +'</div>';
   }
   html+='</div>';
   return html;
-}
-
-function getDeckPartsText(d){
-  var p=[];
-  if(d.blade)p.push(d.blade);
-  if(d.lock)p.push(d.lock);
-  if(d.main)p.push(d.main);
-  if(d.assist)p.push(d.assist);
-  if(d.lock4)p.push(d.lock4);
-  if(d.metal)p.push(d.metal);
-  if(d.over)p.push(d.over);
-  if(d.assist4)p.push(d.assist4);
-  if(d.combo)p.push(d.combo);
-  else{if(d.ratchet)p.push(d.ratchet);if(d.bit)p.push(d.bit);}
-  return p.join(' / ');
 }
 
 function selectDeckChoiceMode(side,idx,mode){
@@ -2028,11 +2054,46 @@ function saveTempDeck(){
   renderBattleSetup();
 }
 
+// ============================================================
+// デッキ重複チェック共通関数
+// ============================================================
+function checkDeckDupe(deckArr, skipIdx, newNames){
+  if(!BS.ruleNoDupe) return null;
+  for(var i=0;i<deckArr.length;i++){
+    if(i===skipIdx) continue;
+    if(!deckArr[i].parts) continue;
+    var otherNames=getAllNames(deckArr[i].parts);
+    var dupes=newNames.filter(function(n){
+      return otherNames.indexOf(n)>=0;
+    });
+    if(dupes.length) return {deckNum:i+1, parts:dupes};
+  }
+  return null;
+}
+
+function checkAllDecksDupe(deckArr, label){
+  for(var i=0;i<deckArr.length;i++){
+    if(!deckArr[i].parts) continue;
+    var names=getAllNames(deckArr[i].parts);
+    var dup=checkDeckDupe(deckArr,i,names);
+    if(dup) return label+'のデッキ'+(i+1)+'とデッキ'+dup.deckNum+'に重複：'+dup.parts.join(', ');
+  }
+  return null;
+}
+
 function tryStartBattle(){
   // 全デッキ選択確認
   var allSet=BS.myDecks.every(function(d){return !!d.parts;})
     &&BS.oppDecks.every(function(d){return !!d.parts;});
   if(!allSet){showToast('全てのデッキを選択してください');return;}
+
+  // 重複チェック（ruleNoDupeがtrueの場合のみ）
+  var myDupe=checkAllDecksDupe(BS.myDecks, myPlayerName);
+  if(myDupe){showToast(myDupe);return;}
+
+  var oppDupe=checkAllDecksDupe(BS.oppDecks, BS.oppName);
+  if(oppDupe){showToast(oppDupe);return;}
+
   BS.currentMyDeckIdx=0;
   BS.currentOppDeckIdx=0;
   BS.myPt=0;BS.oppPt=0;BS.battles=[];
@@ -2859,6 +2920,7 @@ var addPickerBladeLine='bx';
 var addPickerCxPat=3;
 var addPickerTemp={};  // {blade, lock, main, assist, lock4, metal, over, assist4, ratchet, bit, combo}
 
+/*開く*/
 function openAddPart(){
   document.getElementById('modal-part').classList.remove('hidden');
 }
