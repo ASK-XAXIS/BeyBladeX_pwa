@@ -1968,7 +1968,7 @@ function openSavedDeckPicker(side,idx){
       return '<div class="part-sel-item" onclick="pickSavedDeck('+d.id+')" style="margin-bottom:8px;cursor:pointer;">'
         +'<div style="flex:1;">'
           +'<div style="font-size:13px;font-weight:500;">'+d.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getDeckPartsText(d)+'</div>'
+          +'<div style="font-size:10px;color:var(--text2);margin-top:2px;">'+getAllNames(d).join(' / ')+'</div>'
         +'</div>'
         +'<i class="ti ti-chevron-right" style="color:var(--text3);"></i>'
       +'</div>';
