@@ -1968,8 +1968,8 @@ function getBestComboHtml(p, records) {
                 var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
                 html += '<div class="best-combo-item">'
                     + '<span class="best-combo-rank">' + medal + '</span>'
-                    + '<span class="best-combo-name">' + item.name + '：' + '</span>'
-                    + '<span class="best-combo-rate">' + item.rate + '% (' + item.wins + '/' + item.total + '戦)</span>'
+                    + '<span class="best-combo-name">' + item.name + '：勝率' + '</span>'
+                    + '<span class="best-combo-rate">' + item.rate + '% (' + item.wins + '勝/' + item.total + '戦中)</span>'
                     + '</div>';
             });
             html += '</div>';
