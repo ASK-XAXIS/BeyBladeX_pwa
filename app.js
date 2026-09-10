@@ -2573,16 +2573,18 @@ function saveRename() {
 }
 
 
-// DECK BUILD
+// デッキ作成
 var deckMode = 'owned';
-// DS stores current deck selections
+// DS ->デッキセット：選択中のデッキの情報
 var DS = {
-    bladeLine: null,   // 'bx','ux','cx'
-    cxPat: 3,          // 3 or 4
-    blade: null,       // BX/UX blade name
-    lock: null, main: null, assist: null,        // CX 3-part
-    lock4: null, metal: null, over: null, assist4: null, // CX 4-part
-    ratchet: null, bit: null, combo: null
+    bladeLine: null,   // 'bx','ux','cx'各ラインの種別
+    cxPat: 3,          // 3 or 4　cxラインの場合3ピース型か4ピース型のどっちか
+    blade: null,       // BX/UXラインはブレードの名前そのまま
+    lock: null, main: null, assist: null,        // CXラインの3ピースの各ピースの名前
+    lock4: null, metal: null, over: null, assist4: null, // CXラインの４ピースの各ピースの名前
+    ratchet: null, //ラチェット名 
+    bit: null,  //ビット名
+    combo: null //ラチェット+ビット1体型
 };
 var userEditedName = false;
 
@@ -2898,7 +2900,8 @@ var pickerSearchQuery = '';
 
 function renderPickerMain() {
     var area = document.getElementById('picker-main-area');
-    var searchHtml = '<div class="search-wrap" id="picker-search-wrap" style="padding:0 0 10px;">'
+    var searchHtml =
+        '<div class="search-wrap" id="picker-search-wrap" style="padding:0 0 10px;">'
         + '<i class="ti ti-search search-icon" style="left:12px;"></i>'
         + '<input class="search-input" id="picker-search-inp" placeholder="パーツ名で検索..." '
         + 'value="' + pickerSearchQuery + '" oninput="onPickerSearch(this.value)" autocomplete="off">'
@@ -2929,7 +2932,8 @@ function renderPickerMain() {
                 var metalItems = getPickerParts('blade', 'cx', 'metal');
                 var overItems = getPickerParts('blade', 'cx', 'over');
                 var assistItems = getPickerParts('blade', 'cx', 'assist');
-                listHtml = '<div class="picker-section"><div class="picker-section-label">ロックチップ</div>'
+                listHtml =
+                    '<div class="picker-section"><div class="picker-section-label">ロックチップ</div>'
                     + '<div class="radio-list">' + makeRadioList(lockItems, 'lock4', null, false) + '</div></div>'
                     + '<div class="picker-section"><div class="picker-section-label">メタルブレード</div>'
                     + '<div class="radio-list">' + makeRadioList(metalItems, 'metal', null, false) + '</div></div>'
