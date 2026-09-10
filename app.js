@@ -1961,7 +1961,7 @@ function getBestComboHtml(p, records) {
         var catLabel = { blade: 'ブレード', ratchet: 'ラチェット', bit: 'ビット/一体型' }[tCat] || tCat;
         html += '<div class="best-combo-title">' + catLabel + '</div>';
         if (!ranked.length) {
-            html += '<div style="font-size:10px;color:var(--text3);padding:4px 0 6px;">データ不足</div>';
+            html += '<div style="font-size:10px;color:var(--text3);padding:4px 0 6px;">データ不足(ビット一体型使用の場合ビットでカウントされてます)</div>';
         } else {
             html += '<div class="best-combo-list">';
             ranked.forEach(function (item, i) {

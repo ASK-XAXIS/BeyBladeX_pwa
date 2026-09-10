@@ -1,10 +1,12 @@
 // BX Manager - Service Worker
-const CACHE_NAME = 'bx-manager-v4.2.0';
+const CACHE_NAME = 'bx-manager-v4.2.3';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   '/icon-180.png',
+  '/app.js',
+  '/style.css',
 ];
 
 // インストール：アイコン等の静的アセットだけキャッシュ
