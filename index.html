@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>X Manager</title>
+  <title>BX Manager</title>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2989,7 +2989,7 @@
       document.getElementById('screen-' + name).classList.add('active');
       document.getElementById('nav-' + name).classList.add('active');
 
-      //画面ごとの描画関数を呼ぶ
+      //画面ごとの描画関数を呼ぶ(画面下部のタブを押すとそれぞれが呼ばれる)
       if (name === 'home') renderHome();
       if (name === 'parts') renderParts();
       if (name === 'decks') renderDecks();

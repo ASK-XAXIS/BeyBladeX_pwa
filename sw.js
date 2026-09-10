@@ -1,5 +1,5 @@
 // BEYBLADE X Manager - Service Worker
-const CACHE_NAME = 'bx-manager-v4.1.3';
+const CACHE_NAME = 'bx-manager-v4.1.4';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/icon-192.png',
