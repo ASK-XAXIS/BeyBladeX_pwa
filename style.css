@@ -98,9 +98,6 @@ body {
 
 .nav {
     padding-bottom: env(safe-area-inset-bottom);
-}
-
-.nav {
     display: flex;
     background: var(--nav-bg);
     border-top: 0.5px solid var(--nav-border);
@@ -685,9 +682,9 @@ body {
     /*z軸（奥行き）:最前面（0が一番奥）*/
 }
 
+/*モーダルはhiddenクラスで非表示にする*/
 .modal-overlay.hidden {
     display: none;
-    /*hiddenクラスで非表示にする*/
 }
 
 .modal {
@@ -1228,7 +1225,7 @@ body {
     display: block;
 }
 
-/* ホーム最近追加 */
+/* ホーム追加 */
 .home-recent-section {
     margin: 0 16px 14px;
 }
