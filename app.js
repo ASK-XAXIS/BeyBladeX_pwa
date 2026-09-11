@@ -1047,6 +1047,28 @@ function startBattleSetup(mode) {
     }
 }
 
+/**
+ * retryBattleSetup(mode)
+ *  対戦時に「もう一度」ボタンを押したときに呼ばれる関数
+ * （自分と対戦相手のデッキ情報を保持したままセッティング画面に戻る）
+ * */
+function retryBattleSetup(mode) {
+    BS.mode = mode;
+    BS.myPt = 0; BS.oppPt = 0; BS.battles = [];
+    BS.finished = false; BS.winner = null;
+    BS.currentMyDeckIdx = 0; BS.currentOppDeckIdx = 0;
+
+    if (mode === 'free') {
+        BS.ruleWinPt = 4; BS.ruleDeckCount = 1; BS.ruleNoDupe = true;
+        renderBattleSetup();
+    } else if (mode === 'official') {
+        BS.ruleWinPt = 4; BS.ruleDeckCount = 3; BS.ruleNoDupe = true;
+        renderBattleSetup();
+    } else {
+        renderMyRuleSetup();
+    }
+}
+
 function renderMyRuleSetup() {
     document.getElementById('battle-screen-title').textContent = 'マイルール設定';
     var mr = myRuleSetting;
@@ -1094,13 +1116,6 @@ function renderBattleSetup() {
     var deckCount = BS.ruleDeckCount;
     var html = '<div style="padding:0 0 80px;">';
 
-    // 相手の名前入力
-    html += '<div class="battle-section">'
-        + '<div class="battle-section-title">対戦相手の名前</div>'
-        + '<input class="battle-name-input" id="opp-name-inp" value="' + BS.oppName + '" placeholder="対戦相手" '
-        + 'oninput="BS.oppName=this.value||\'対戦相手\'">'
-        + '</div>';
-
     // 自分のデッキ
     html += '<div class="battle-section"><div class="battle-section-title">自分のデッキ（' + deckCount + '個）</div>';
     for (var i = 0; i < deckCount; i++) {
@@ -1109,6 +1124,13 @@ function renderBattleSetup() {
     html += '</div>';
 
     html += '<div class="battle-vs">VS</div>';
+
+    // 相手の名前入力
+    html += '<div class="battle-section">'
+        + '<div class="battle-section-title">対戦相手の名前</div>'
+        + '<input class="battle-name-input" id="opp-name-inp" value="' + BS.oppName + '" placeholder="対戦相手" '
+        + 'oninput="BS.oppName=this.value||\'対戦相手\'">'
+        + '</div>';
 
     // 相手のデッキ
     html += '<div class="battle-section"><div class="battle-section-title">' + BS.oppName + 'のデッキ（' + deckCount + '個）</div>';
@@ -1473,7 +1495,7 @@ function renderBattleResult() {
     html += renderUnregDeckPrompts();
 
     html += '<div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;">'
-        + '<button class="btn-save" onclick="startBattleSetup(BS.mode)" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;cursor:pointer;">もう一度</button>'
+        + '<button class="btn-save" onclick="retryBattleSetup(BS.mode)" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;cursor:pointer;">もう一度</button>'
         + '<button class="btn-sm" onclick="renderBattleHome()" style="width:100%;padding:12px;text-align:center;">モード選択に戻る</button>'
         + '</div>';
     html += '</div>';
@@ -1864,6 +1886,26 @@ function toggleMemo(id) {
 // ============================================================
 // パーツ統計計算
 // ============================================================
+
+//バースト負けの回数
+function getBurstLossCount(partName, records) {
+    var burstCount = 0;
+    for (var i = 0; i < records.length; i++) {
+        var record = records[i];
+        for (var j = 0; j < record.battles.length; j++) {
+            var battle = record.battles[j];
+            if (battle.winner === 'opp' && battle.finish === 'bf') {
+                var deckUsed = record.myDecks[battle.myDeckIdx];
+                var partNames = getAllNames(deckUsed.parts);
+                if (partNames.indexOf(partName) >= 0) {
+                    burstCount++;
+                }
+            }
+        }
+    }
+    return burstCount;
+}
+
 function getPartStatsHtml(p) {
     // このパーツを含む試合記録を抽出
     var records = getPartRecords(p.name);
@@ -1888,6 +1930,14 @@ function getPartStatsHtml(p) {
 
     // ベストコンボパーツ（カテゴリ別）
     html += getBestComboHtml(p, records);
+
+    //バースト回数の表示
+    var burstCount = getBurstLossCount(p.name, records);
+    if (burstCount > 0) {
+        html += '<div class="part-stats-title">💥 バースト負け回数<span style="font-size:22px;font-weight:700;color:var(--danger);">' + burstCount + '</span>'
+            + '<span style="font-size:12px;color:var(--text2);"> 回</span>'
+            + '</div>';
+    }
 
     return html;
 }
