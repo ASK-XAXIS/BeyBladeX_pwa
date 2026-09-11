@@ -3215,21 +3215,22 @@ function renderMyPlayerCard() {
 
     //QRコードに含むデータ
     var qrData = JSON.stringify({
-        version: 1,
-        playerName: myPlayerName,
-        wins: wins,
-        total: total,
-        decks: battleDecks.map(function (d) {
+        v: 1,
+        n: myPlayerName,
+        w: wins,
+        t: total,
+        d: battleDecks.map(function (d) {
             return {
-                name: d.name,
-                blade: d.blade,
-                ratchet: d.ratchet,
-                bit: d.bit,
-                combo: d.combo
+                b: d.blade || '',
+                r: d.ratchet || '',
+                bt: d.bit || '',
+                c: d.combo || ''
             };
         })
     });
-    console.log('qrDataの文字数:', qrData.length);
+    console.log('内容:', qrData);
+    console.log('文字数:', qrData.length);
+    console.log('バイト数:', encodeURIComponent(qrData).length);
 
     var html = '<div style="padding:0 0 80px;">';
 
@@ -3274,10 +3275,15 @@ function renderMyPlayerCard() {
 
     // QRコード生成（HTML描画後に実行）
     setTimeout(function () {
-        new QRCode(document.getElementById('qr-code-area'), {
-            text: qrData,
-            width: 128,
-            height: 128,
+        var qrArea = document.getElementById('qr-code-area');
+        if (!qrArea) return;
+        var canvas = document.createElement('canvas');
+        qrArea.appendChild(canvas);
+        new QRious({
+            element: canvas,
+            value: qrData,
+            size: 200,
+            level: 'L'
         });
     }, 300);
 
