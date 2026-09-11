@@ -984,7 +984,7 @@ function renderBattleHome() {
     // 設定
     html += '<div style="padding:0 16px;">'
         + '<div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:14px;">'
-        + '<div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:12px;">⚙️ 勝敗カウント設定</div>'
+        + '<div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:12px;">⚙️ マイルール用勝敗カウント設定</div>'
         + '<div class="rule-setting-row">'
         + '<div><div class="rule-setting-label">カウント単位</div>'
         + '<div class="rule-setting-sub">試合単位：4pt到達で1勝 / バトル単位：1バトルで1勝</div></div>'
@@ -3162,7 +3162,9 @@ if (window.navigator.standalone) {
     document.body.style.paddingTop = 'env(safe-area-inset-top)';
 }
 
-/*QRコード関連*/
+/*プレイヤーカード関連*/
+
+//プレイヤーカードホーム画面
 function renderPlayerCardHome() {
     document.getElementById('battle-screen-title').textContent = 'プレーヤーカード';
     var html = '<div style="padding:0 0 80px;">';
@@ -3176,21 +3178,21 @@ function renderPlayerCardHome() {
 
     html += '<div style="padding:12px 16px 4px;font-size:11px;color:var(--text2);">カードを選択</div>';
 
-    //自分のカード
+    //自分のカードボタン
     html += '<div class="battle-mode-card" onclick="renderMyPlayerCard()">'
         + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">🌌</div>'
         + '<div class="battle-mode-info"><h3>マイカード</h3>'
         + '<p>自分のプレイヤーカード、自分のQRコードを確認できます</p></div>'
         + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
         + '</div>';
-    //ライバルカード一覧
+    //ライバルカード一覧ボタン
     html += '<div class="battle-mode-card" onclick="renderRivalList()">'
         + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">👥</div>'
         + '<div class="battle-mode-info"><h3>ライバルカード</h3>'
         + '<p>ライバルのプレイヤーカードを確認できます</p></div>'
         + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
         + '</div>';
-    //QRコードを読み取る
+    //QRコードを読み取る（カメラ起動）ボタン
     html += '<div class="battle-mode-card" onclick="renderQRReader()">'
         + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">📸</div>'
         + '<div class="battle-mode-info"><h3>QRコード読み取り</h3>'
@@ -3307,7 +3309,7 @@ function renderMyPlayerCard() {
     }, 300);
 }
 
-
+//プレイヤーネーム編集関数
 function togglePlayerNameEdit() {
     var display = document.getElementById('player-name-display');
     var editArea = document.getElementById('player-name-edit');
@@ -3316,6 +3318,7 @@ function togglePlayerNameEdit() {
     editArea.style.display = isEditing ? 'none' : 'block';
 }
 
+//プレイヤーネーム保存関数（カード画面）
 function savePlayerNameFromCard() {
     var inp = document.getElementById('player-name-inp-card');
     if (!inp) return;
@@ -3325,4 +3328,30 @@ function savePlayerNameFromCard() {
     var display = document.getElementById('player-name-display');
     if (display) display.textContent = newName;
     togglePlayerNameEdit();
+}
+
+function renderRivalList() {
+    var html = '<div style="padding:0 0 80px;">';
+
+    //戻るボタン
+    html += '<div style="padding:12px 16px 4px;">'
+        + '<button class="btn-sm" onclick="renderPlayerCardHome()" '
+        + 'style="padding:6px 12px;">'
+        + '<i class="ti ti-arrow-left"></i> 戻る</button>'
+        + '</div>';
+
+    if (rivals.length === 0) {
+        html += '<div style="padding:16px;text-align:center;color:var(--text3);">ライバルが登録されていません</div>';
+    } else {
+        rivals.forEach(function (rival) {
+            html += '<div class="battle-mode-card" onclick="renderRivalCard(' + rival.id + ')">'
+                + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">👤</div>'
+                + '<div class="battle-mode-info"><h3>' + rival.playerName + '</h3>'
+                + '<p>勝率 ' + (rival.total > 0 ? Math.round(rival.wins / rival.total * 100) : 0) + '% (' + rival.wins + '勝 / ' + rival.total + '試合)</p></div>'
+                + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
+                + '</div>';
+        });
+    }
+    html += '</div>';
+    document.getElementById('battle-content').innerHTML = html;
 }
