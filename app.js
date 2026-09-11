@@ -3221,17 +3221,17 @@ function renderMyPlayerCard() {
         t: total,
         d: battleDecks.map(function (d) {
             var bladeStr = '';
-           if(d.bladeLine === 'cx'){
-    // 3ピースのフィールドに値があれば3ピース、なければ4ピース
-    var is3piece = !!(d.lock || d.main || d.assist);
-    if(is3piece){
-        bladeStr = [d.lock, d.main, d.assist].filter(Boolean).join('+');
-    } else {
-        bladeStr = [d.lock4, d.metal, d.over, d.assist4].filter(Boolean).join('+');
-    }
-} else {
-    bladeStr = d.blade || '';
-}
+            if (d.bladeLine === 'cx') {
+                // 3ピースのフィールドに値があれば3ピース、なければ4ピース
+                var is3piece = !!(d.lock || d.main || d.assist);
+                if (is3piece) {
+                    bladeStr = [d.lock, d.main, d.assist].filter(Boolean).join('+');
+                } else {
+                    bladeStr = [d.lock4, d.metal, d.over, d.assist4].filter(Boolean).join('+');
+                }
+            } else {
+                bladeStr = d.blade || '';
+            }
             return {
                 b: bladeStr,
                 r: d.ratchet || '',
@@ -3255,13 +3255,19 @@ function renderMyPlayerCard() {
 
 
     //プレイヤーカード表示
-    html += '<div class="player-card">'
-        + '<div class="player-card-name">'
-        + '<input style=style="background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--text);font-size:20px;font-weight:700;width:100%;"'
-        + 'value="' + myPlayerName + '" '
-        + 'onchange="savePlayerName(this.value);renderMyPlayerCard();">'
-        + '</div>';
-    +'<div class ="player-card-stats">'
+    html += '<div class="player-card">';
+    html += '<div class="player-card-name" style="display:flex;align-items:center;gap:8px;">'
+        + '<span id="player-name-display" style="font-size:20px;font-weight:700;color:var(--text);">' + myPlayerName + '</span>'
+        + '<button class="btn-sm" onclick="togglePlayerNameEdit()" style="font-size:10px;padding:3px 8px;">✏️</button>'
+        + '</div>'
+        + '<div id="player-name-edit" style="display:none;margin-top:8px;">'
+        + '<input id="player-name-inp-card" class="battle-name-input" value="' + myPlayerName + '" style="width:100%;">'
+        + '<div style="display:flex;gap:6px;margin-top:6px;">'
+        + '<button class="btn-save" onclick="savePlayerNameFromCard()" style="flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;cursor:pointer;">保存</button>'
+        + '<button class="btn-sm" onclick="togglePlayerNameEdit()" style="flex:1;padding:8px;text-align:center;">キャンセル</button>'
+        + '</div>'
+        + '</div>'
+        + '<div class ="player-card-stats">'
         + '勝率 ' + rate + '%(' + wins + '勝 / ' + total + '試合)'
         + '</div>';
 
@@ -3276,6 +3282,7 @@ function renderMyPlayerCard() {
     } else {
         html += '<div style="font-size:12px;color:var(--text3);">試合用デッキ未登録</div>';
     }
+
     html += '</div>';
 
 
@@ -3298,5 +3305,24 @@ function renderMyPlayerCard() {
             level: 'L'
         });
     }, 300);
+}
 
+
+function togglePlayerNameEdit() {
+    var display = document.getElementById('player-name-display');
+    var editArea = document.getElementById('player-name-edit');
+    if (!display || !editArea) return;
+    var isEditing = editArea.style.display !== 'none';
+    editArea.style.display = isEditing ? 'none' : 'block';
+}
+
+function savePlayerNameFromCard() {
+    var inp = document.getElementById('player-name-inp-card');
+    if (!inp) return;
+    var newName = inp.value.trim();
+    if (!newName) { showToast('名前を入力してください'); return; }
+    savePlayerName(newName);
+    var display = document.getElementById('player-name-display');
+    if (display) display.textContent = newName;
+    togglePlayerNameEdit();
 }
