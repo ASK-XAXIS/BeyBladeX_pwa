@@ -6,6 +6,11 @@ var nextId = parseInt(localStorage.getItem('bx_nextId') || '1');
 var decks = JSON.parse(localStorage.getItem('bx_decks') || '[]');
 var nextDeckId = parseInt(localStorage.getItem('bx_nextDeckId') || '1');
 var renameDeckId = null;
+// ライバルカード一覧
+var rivals = JSON.parse(localStorage.getItem('bx_rivals') || '[]');
+function saveRivals() {
+    localStorage.setItem('bx_rivals', JSON.stringify(rivals));
+}
 
 // パーツデータベース
 var ALL_DB = [
@@ -412,7 +417,7 @@ function renderTimerHome() {
         '<div style="padding:0 0 80px;">'
         + '<div style="padding:12px 16px 4px;font-size:11px;color:var(--text2);">計測対象のベイを選択してください</div>'
         + '<div class="battle-mode-card" onclick="startTimerSelect(\'saved\')">'
-        + '<div class="battle-mode-icon" style="background:rgba(0,204,68,0.15);">🛡️</div>'
+        + '<div class="battle-mode-icon" style="background:rgba(0,204,68,0.15);">🌀</div>'
         + '<div class="battle-mode-info"><h3>マイデッキから選ぶ</h3><p>登録済みのデッキを計測対象に選択</p></div>'
         + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
         + '</div>'
@@ -967,6 +972,15 @@ function renderBattleHome() {
         + '<p>勝利pt・デッキ数・重複可否を自由に設定。</p></div>'
         + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
         + '</div>';
+
+    // プレイヤーカード一覧
+    html += '<div class="battle-mode-card" onclick="renderPlayerCardHome()">'
+        + '<div class="battle-mode-icon" style="background:rgba(0,204,68,0.15);">📩</div>'
+        + '<div class="battle-mode-info"><h3>プレイヤーカード</h3>'
+        + '<p>自分のカードを表示・ライバルのカードを管理。</p></div>'
+        + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
+        + '</div>';
+
     // 設定
     html += '<div style="padding:0 16px;">'
         + '<div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;padding:14px;">'
@@ -1168,7 +1182,7 @@ function renderDeckSelectSlot(side, idx) {
     var html = '<div class="deck-select-slot" id="slot-' + side + '-' + idx + '">'
         + '<div class="deck-slot-label">' + label + '</div>'
         + '<div class="deck-slot-choice">'
-        + '<button class="deck-choice-btn ' + (deck.choiceMode === 'saved' ? 'active' : '') + '" onclick="selectDeckChoiceMode(\'' + side + '\',' + idx + ',\'saved\')">📋 マイデッキから選択</button>'
+        + '<button class="deck-choice-btn ' + (deck.choiceMode === 'saved' ? 'active' : '') + '" onclick="selectDeckChoiceMode(\'' + side + '\',' + idx + ',\'saved\')">🌀 マイデッキから選択</button>'
         + '<button class="deck-choice-btn ' + (deck.choiceMode === 'new' ? 'active' : '') + '" onclick="selectDeckChoiceMode(\'' + side + '\',' + idx + ',\'new\')">✏️ 新しいデッキを組む</button>'
         + '</div>';
     if (deck.parts) {
@@ -3146,4 +3160,125 @@ if ('serviceWorker' in navigator) {
 }
 if (window.navigator.standalone) {
     document.body.style.paddingTop = 'env(safe-area-inset-top)';
+}
+
+/*QRコード関連*/
+function renderPlayerCardHome() {
+    document.getElementById('battle-screen-title').textContent = 'プレーヤーカード';
+    var html = '<div style="padding:0 0 80px;">';
+
+    //戻るボタン
+    html += '<div style="padding:12px 16px 4px;">'
+        + '<button class="btn-sm" onclick="renderBattleHome()" '
+        + 'style="padding:6px 12px;">'
+        + '<i class="ti ti-arrow-left"></i> 戻る</button>'
+        + '</div>';
+
+    html += '<div style="padding:12px 16px 4px;font-size:11px;color:var(--text2);">カードを選択</div>';
+
+    //自分のカード
+    html += '<div class="battle-mode-card" onclick="renderMyPlayerCard()">'
+        + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">🌌</div>'
+        + '<div class="battle-mode-info"><h3>マイカード</h3>'
+        + '<p>自分のプレイヤーカード、自分のQRコードを確認できます</p></div>'
+        + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
+        + '</div>';
+    //ライバルカード一覧
+    html += '<div class="battle-mode-card" onclick="renderRivalList()">'
+        + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">👥</div>'
+        + '<div class="battle-mode-info"><h3>ライバルカード</h3>'
+        + '<p>ライバルのプレイヤーカードを確認できます</p></div>'
+        + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
+        + '</div>';
+    //QRコードを読み取る
+    html += '<div class="battle-mode-card" onclick="renderQRReader()">'
+        + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">📸</div>'
+        + '<div class="battle-mode-info"><h3>QRコード読み取り</h3>'
+        + '<p>ライバルのプレイヤーカードのQRコードを読み取ります</p></div>'
+        + '<i class="ti ti-chevron-right" style="color:var(--text3);margin-left:auto;"></i>'
+        + '</div>';
+    html += '</div>';
+    document.getElementById('battle-content').innerHTML = html;
+}
+
+
+
+
+
+//プレイヤーカード画面
+function renderMyPlayerCard() {
+
+    var wins = battleRecords.filter(function (r) { return r.result === 'win'; }).length;
+    var total = battleRecords.length;
+    var battleDecks = decks.filter(function (d) { return d.battle; });
+    var rate = total > 0 ? Math.round(wins / total * 100) : 0;
+
+    //QRコードに含むデータ
+    var qrData = JSON.stringify({
+        version: 1,
+        playerName: myPlayerName,
+        wins: wins,
+        total: total,
+        decks: battleDecks.map(function (d) {
+            return {
+                name: d.name,
+                blade: d.blade,
+                ratchet: d.ratchet,
+                bit: d.bit,
+                combo: d.combo
+            };
+        })
+    });
+    console.log('qrDataの文字数:', qrData.length);
+
+    var html = '<div style="padding:0 0 80px;">';
+
+    //戻るボタン
+    html += '<div style="padding:12px 16px 4px;">'
+        + '<button class="btn-sm" onclick="renderPlayerCardHome()" '
+        + 'style="padding:6px 12px;">'
+        + '<i class="ti ti-arrow-left"></i> 戻る</button>'
+        + '</div>';
+
+
+    //プレイヤーカード表示
+    html += '<div class="player-card">'
+        + '<div class="player-card-name">'
+        + '<input style=style="background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--text);font-size:20px;font-weight:700;width:100%;"'
+        + 'value="' + myPlayerName + '" '
+        + 'onchange="savePlayerName(this.value);renderMyPlayerCard();">'
+        + '</div>';
+    +'<div class ="player-card-stats">'
+        + '勝率 ' + rate + '%(' + wins + '勝 / ' + total + '試合)'
+        + '</div>';
+
+    //試合用デッキ一覧
+    if (battleDecks.length) {
+        battleDecks.forEach(function (d) {
+            html += '<div class ="player-card-deck">'
+                + '<div class ="player-card-deck-name">' + d.name + '</div>'
+                + '<div>' + getAllNames(d).join(' / ') + '</div>'
+                + '</div>';
+        });
+    } else {
+        html += '<div style="font-size:12px;color:var(--text3);">試合用デッキ未登録</div>';
+    }
+    html += '</div>';
+
+
+    // HTMLにQRコード表示用のdiv
+    html += '<div id="qr-code-area" style="display:flex;justify-content:center;padding:16px;"></div>';
+
+    html += '</div>';
+    document.getElementById('battle-content').innerHTML = html;
+
+    // QRコード生成（HTML描画後に実行）
+    setTimeout(function () {
+        new QRCode(document.getElementById('qr-code-area'), {
+            text: qrData,
+            width: 128,
+            height: 128,
+        });
+    }, 300);
+
 }

@@ -1,7 +1,7 @@
 // BX Manager - Service Worker
 
 //内容にかかわる部分で変更があったらバージョンを上げる
-const CACHE_NAME = 'bx-manager-v4.3.1';
+const CACHE_NAME = 'bx-manager-v4.3.2';
 //使用するファイル分追加する
 const STATIC_ASSETS = [
   '/manifest.json',
