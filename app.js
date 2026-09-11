@@ -3220,8 +3220,20 @@ function renderMyPlayerCard() {
         w: wins,
         t: total,
         d: battleDecks.map(function (d) {
+            var bladeStr = '';
+           if(d.bladeLine === 'cx'){
+    // 3ピースのフィールドに値があれば3ピース、なければ4ピース
+    var is3piece = !!(d.lock || d.main || d.assist);
+    if(is3piece){
+        bladeStr = [d.lock, d.main, d.assist].filter(Boolean).join('+');
+    } else {
+        bladeStr = [d.lock4, d.metal, d.over, d.assist4].filter(Boolean).join('+');
+    }
+} else {
+    bladeStr = d.blade || '';
+}
             return {
-                b: d.blade || '',
+                b: bladeStr,
                 r: d.ratchet || '',
                 bt: d.bit || '',
                 c: d.combo || ''
