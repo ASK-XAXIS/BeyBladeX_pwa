@@ -263,7 +263,7 @@
     <div class="modal">
       <h3>デッキを作成</h3>
       <label class="form-label" style="margin-top:0;">デッキ名（省略で自動生成）</label>
-      <input class="form-input" id="deck-name-inp" placeholder="自動生成されます">
+      <input class="form-input" id="deck-name-inp" oninput="onDeckNameInput(this.value)" placeholder="自動生成されます">
       <div class="name-hint" id="deck-name-hint"></div>
 
       <label class="form-label">パーツ選択モード</label>

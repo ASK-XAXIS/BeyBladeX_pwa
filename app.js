@@ -1268,7 +1268,10 @@ function openNewDeckBuilder(side, idx) {
     };
     userEditedName = false;
     document.getElementById('deck-name-inp').value = '';
-    document.getElementById('deck-name-inp').oninput = function () { userEditedName = true; };
+    document.getElementById('deck-name-inp').oninput = function () { 
+    userEditedName = true;
+    onDeckNameInput(this.value);
+};
     document.getElementById('deck-name-hint').textContent = '';
     document.getElementById('dt-owned').classList.remove('active');
     document.getElementById('dt-all').classList.add('active');
@@ -2670,7 +2673,10 @@ function openAddDeck() {
     DS = { bladeLine: null, cxPat: 3, blade: null, lock: null, main: null, assist: null, lock4: null, metal: null, over: null, assist4: null, ratchet: null, bit: null, combo: null };
     userEditedName = false;
     document.getElementById('deck-name-inp').value = '';
-    document.getElementById('deck-name-inp').oninput = function () { userEditedName = true; };
+    document.getElementById('deck-name-inp').oninput = function () {
+    userEditedName = true;
+    onDeckNameInput(this.value);
+};
     document.getElementById('deck-name-hint').textContent = '';
     document.getElementById('dt-owned').classList.remove('active');
     document.getElementById('dt-all').classList.add('active');
@@ -3587,4 +3593,59 @@ function addRival() {
     pendingRivalData = null;
     showToast('ライバルのプレイヤーカードを追加しました', 'ok');
     renderRivalList();
+}
+
+
+    function parseDeckName(str) {
+    var result = {
+        blade: null,
+        ratchet: null,
+        bit: null,
+        combo: null
+    };
+
+    // ALL_DBのパーツ名を長い順にソートして照合
+    var sorted = ALL_DB.slice().sort(function(a, b) {
+        return b.name.length - a.name.length;
+    });
+
+    sorted.forEach(function(p) {
+        // 正式名での照合
+        var matchFull = str.indexOf(p.name) >= 0;
+
+        // 括弧を除いた短縮名での照合（例：「F（フラット）」→「F」）
+        var shortName = p.name.replace(/（.*?）/g, '').trim();
+        var matchShort = shortName.length > 0 && str.indexOf(shortName) >= 0;
+
+        if (matchFull || matchShort) {
+            if (p.cat === 'blade' && !result.blade) result.blade = p.name;
+            if (p.cat === 'ratchet' && !result.ratchet) result.ratchet = p.name;
+            if (p.cat === 'bit' && !result.bit) result.bit = p.name;
+            if (p.cat === 'combo' && !result.combo) result.combo = p.name;
+        }
+    });
+
+    return result;
+}
+
+function onDeckNameInput(val) {
+    userEditedName = true;
+    var parsed = parseDeckName(val);
+    
+    // bladeLineを自動設定
+    if (parsed.blade) {
+        var bladeItem = ALL_DB.find(function(p){
+            return p.name === parsed.blade && p.cat === 'blade';
+        });
+        if (bladeItem) DS.bladeLine = bladeItem.line; // 'bx','ux','cx'
+    }
+
+    // 解析結果をDSに反映
+    if (parsed.blade) DS.blade = parsed.blade;
+    if (parsed.ratchet) DS.ratchet = parsed.ratchet;
+    if (parsed.bit) DS.bit = parsed.bit;
+    if (parsed.combo) DS.combo = parsed.combo;
+
+    // 画面を更新
+    updateDeckDisplay();
 }
