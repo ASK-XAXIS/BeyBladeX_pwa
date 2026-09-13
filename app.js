@@ -3302,17 +3302,17 @@ function renderMyPlayerCard() {
 
     // QRコード生成（HTML描画後に実行）
     setTimeout(function () {
-        var qrArea = document.getElementById('qr-code-area');
-        if (!qrArea) return;
-        var canvas = document.createElement('canvas');
-        qrArea.appendChild(canvas);
-        new QRious({
-            element: canvas,
-            value: qrData,
-            size: 200,
-            level: 'L'
-        });
-    }, 300);
+    var qrArea = document.getElementById('qr-code-area');
+    if (!qrArea) return;
+    var canvas = document.createElement('canvas');
+    qrArea.appendChild(canvas);
+    QRCode.toCanvas(canvas, qrData, {
+        width: 300,
+        errorCorrectionLevel: 'L'
+    }, function(error) {
+        if (error) console.log('QRエラー:', error);
+    });
+}, 300);
 }
 
 //プレイヤーネーム編集関数
@@ -3489,6 +3489,8 @@ function scanQRCode() {
 
     var code = jsQR(imageData.data, imageData.width, imageData.height);
 
+     console.log('スキャン中... code:', code ? 'QR検出！' : 'なし');
+    
     if (code) {
         // QRコード検出
         onQRDetected(code.data);
