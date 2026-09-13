@@ -3350,7 +3350,7 @@ function renderRivalList() {
         html += '<div style="padding:16px;text-align:center;color:var(--text3);">ライバルが登録されていません</div>';
     } else {
         rivals.forEach(function (rival) {
-            html += '<div class="battle-mode-card" onclick="renderRivalCard(' + rival.id + ')">'
+            html += '<div class="battle-mode-card" onclick="renderRivalDetail(' + rival.id + ')">'
                 + '<div class="battle-mode-icon" style="background:rgba(124,111,255,0.15);">👤</div>'
                 + '<div class="battle-mode-info"><h3>' + rival.playerName + '</h3>'
                 + '<p>勝率 ' + (rival.total > 0 ? Math.round(rival.wins / rival.total * 100) : 0) + '% (' + rival.wins + '勝 / ' + rival.total + '試合)</p></div>'
