@@ -3596,7 +3596,7 @@ function addRival() {
 }
 
 
-    function parseDeckName(str) {
+   function parseDeckName(str) {
     var result = {
         blade: null,
         ratchet: null,
@@ -3604,48 +3604,95 @@ function addRival() {
         combo: null
     };
 
-    // ALL_DBのパーツ名を長い順にソートして照合
-    var sorted = ALL_DB.slice().sort(function(a, b) {
+    var sorted = ALL_DB.slice().sort(function (a, b) {
         return b.name.length - a.name.length;
     });
 
-    sorted.forEach(function(p) {
-        // 正式名での照合
-        var matchFull = str.indexOf(p.name) >= 0;
+    // マッチした範囲を記録して二重マッチを防ぐ
+    var usedRanges = [];
 
-        // 括弧を除いた短縮名での照合（例：「F（フラット）」→「F」）
+    function isOverlapping(start, end) {
+        return usedRanges.some(function(r) {
+            return start < r.end && end > r.start;
+        });
+    }
+
+//TODO:検索欄にコピペでパーツが選択されるようにしたいが、うまくいかないのでロジックがおかしいと思う
+  sorted.forEach(function (p) {
+    var idx = str.indexOf(p.name);
+    var matched = false;
+    var matchStart = -1, matchEnd = -1;
+
+    // 正式名での照合
+    if (idx >= 0 && !isOverlapping(idx, idx + p.name.length)) {
+        matched = true;
+        matchStart = idx;
+        matchEnd = idx + p.name.length;
+    }
+
+    // 短縮名での照合
+    if (!matched) {
         var shortName = p.name.replace(/（.*?）/g, '').trim();
-        var matchShort = shortName.length > 0 && str.indexOf(shortName) >= 0;
-
-        if (matchFull || matchShort) {
-            if (p.cat === 'blade' && !result.blade) result.blade = p.name;
-            if (p.cat === 'ratchet' && !result.ratchet) result.ratchet = p.name;
-            if (p.cat === 'bit' && !result.bit) result.bit = p.name;
-            if (p.cat === 'combo' && !result.combo) result.combo = p.name;
+        if (shortName.length >= 1) {
+            var sidx = str.indexOf(shortName);
+            if (sidx >= 0 && !isOverlapping(sidx, sidx + shortName.length)) {
+                // 後ろの文字が英数字でないことを確認（誤マッチ防止）
+                var nextChar = str[sidx + shortName.length];
+                var isPartOfLonger = nextChar && /[a-zA-ZA-Za-z]/.test(nextChar);
+                if (!isPartOfLonger) {
+                    matched = true;
+                    matchStart = sidx;
+                    matchEnd = sidx + shortName.length;
+                }
+            }
         }
-    });
+    }
+
+    if (matched) {
+        usedRanges.push({ start: matchStart, end: matchEnd });
+        if (p.cat === 'blade' && !result.blade) result.blade = p.name;
+        if (p.cat === 'ratchet' && !result.ratchet) result.ratchet = p.name;
+        if (p.cat === 'bit' && !result.bit) result.bit = p.name;
+        if (p.cat === 'combo' && !result.combo) result.combo = p.name;
+    }
+});
 
     return result;
 }
 
 function onDeckNameInput(val) {
     userEditedName = true;
-    var parsed = parseDeckName(val);
-    
-    // bladeLineを自動設定
-    if (parsed.blade) {
-        var bladeItem = ALL_DB.find(function(p){
-            return p.name === parsed.blade && p.cat === 'blade';
-        });
-        if (bladeItem) DS.bladeLine = bladeItem.line; // 'bx','ux','cx'
+
+    // 入力が空になったらDSをリセット
+    if (!val.trim()) {
+        DS.bladeLine = null;
+        DS.blade = null;
+        DS.ratchet = null;
+        DS.bit = null;
+        DS.combo = null;
+        updateDeckDisplay();
+        return;
     }
 
-    // 解析結果をDSに反映
-    if (parsed.blade) DS.blade = parsed.blade;
+    // 毎回DSをリセットしてから再解析
+    DS.bladeLine = null;
+    DS.blade = null;
+    DS.ratchet = null;
+    DS.bit = null;
+    DS.combo = null;
+
+    var parsed = parseDeckName(val);
+
+    if (parsed.blade) {
+        var bladeItem = ALL_DB.find(function (p) {
+            return p.name === parsed.blade && p.cat === 'blade';
+        });
+        if (bladeItem) DS.bladeLine = bladeItem.line;
+        DS.blade = parsed.blade;
+    }
     if (parsed.ratchet) DS.ratchet = parsed.ratchet;
     if (parsed.bit) DS.bit = parsed.bit;
     if (parsed.combo) DS.combo = parsed.combo;
 
-    // 画面を更新
     updateDeckDisplay();
 }
