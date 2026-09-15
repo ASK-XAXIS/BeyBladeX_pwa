@@ -3448,7 +3448,7 @@ function startQRCamera() {
     if (!video) return;
 
     navigator.mediaDevices.getUserMedia({
-        video: true//{ facingMode: 'environment' } // 背面カメラ優先
+        video: { facingMode: 'environment' } // 背面カメラ優先
     }).then(function (stream) {
         qrStream = stream;
         video.srcObject = stream;
