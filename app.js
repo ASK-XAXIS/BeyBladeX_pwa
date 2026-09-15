@@ -1268,10 +1268,10 @@ function openNewDeckBuilder(side, idx) {
     };
     userEditedName = false;
     document.getElementById('deck-name-inp').value = '';
-    document.getElementById('deck-name-inp').oninput = function () { 
-    userEditedName = true;
-    onDeckNameInput(this.value);
-};
+    document.getElementById('deck-name-inp').oninput = function () {
+        userEditedName = true;
+        onDeckNameInput(this.value);
+    };
     document.getElementById('deck-name-hint').textContent = '';
     document.getElementById('dt-owned').classList.remove('active');
     document.getElementById('dt-all').classList.add('active');
@@ -2674,9 +2674,9 @@ function openAddDeck() {
     userEditedName = false;
     document.getElementById('deck-name-inp').value = '';
     document.getElementById('deck-name-inp').oninput = function () {
-    userEditedName = true;
-    onDeckNameInput(this.value);
-};
+        userEditedName = true;
+        onDeckNameInput(this.value);
+    };
     document.getElementById('deck-name-hint').textContent = '';
     document.getElementById('dt-owned').classList.remove('active');
     document.getElementById('dt-all').classList.add('active');
@@ -3308,17 +3308,17 @@ function renderMyPlayerCard() {
 
     // QRコード生成（HTML描画後に実行）
     setTimeout(function () {
-    var qrArea = document.getElementById('qr-code-area');
-    if (!qrArea) return;
-    var canvas = document.createElement('canvas');
-    qrArea.appendChild(canvas);
-    QRCode.toCanvas(canvas, qrData, {
-        width: 300,
-        errorCorrectionLevel: 'L'
-    }, function(error) {
-        if (error) console.log('QRエラー:', error);
-    });
-}, 300);
+        var qrArea = document.getElementById('qr-code-area');
+        if (!qrArea) return;
+        var canvas = document.createElement('canvas');
+        qrArea.appendChild(canvas);
+        QRCode.toCanvas(canvas, qrData, {
+            width: 300,
+            errorCorrectionLevel: 'L'
+        }, function (error) {
+            if (error) console.log('QRエラー:', error);
+        });
+    }, 300);
 }
 
 //プレイヤーネーム編集関数
@@ -3408,11 +3408,11 @@ function renderRivalDetail(rivalId) {
     document.getElementById('battle-content').innerHTML = html;
 }
 function deleteRival(rivalId) {
-        rivals = rivals.filter(function (r) { return r.id !== rivalId; });
-        saveRivals();
-        showToast('ライバルのプレイヤーカードを削除しました');
-        renderRivalList();
-    }
+    rivals = rivals.filter(function (r) { return r.id !== rivalId; });
+    saveRivals();
+    showToast('ライバルのプレイヤーカードを削除しました');
+    renderRivalList();
+}
 
 function renderQRReader() {
     document.getElementById('battle-screen-title').textContent = 'QRコード読み取り';
@@ -3448,7 +3448,7 @@ function startQRCamera() {
     if (!video) return;
 
     navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' } // 背面カメラ優先
+        video: true//{ facingMode: 'environment' } // 背面カメラ優先
     }).then(function (stream) {
         qrStream = stream;
         video.srcObject = stream;
@@ -3495,8 +3495,8 @@ function scanQRCode() {
 
     var code = jsQR(imageData.data, imageData.width, imageData.height);
 
-     console.log('スキャン中... code:', code ? 'QR検出！' : 'なし');
-    
+    console.log('スキャン中... code:', code ? 'QR検出！' : 'なし');
+
     if (code) {
         // QRコード検出
         onQRDetected(code.data);
@@ -3596,7 +3596,7 @@ function addRival() {
 }
 
 
-   function parseDeckName(str) {
+function parseDeckName(str) {
     var result = {
         blade: null,
         ratchet: null,
@@ -3612,50 +3612,50 @@ function addRival() {
     var usedRanges = [];
 
     function isOverlapping(start, end) {
-        return usedRanges.some(function(r) {
+        return usedRanges.some(function (r) {
             return start < r.end && end > r.start;
         });
     }
 
-//TODO:検索欄にコピペでパーツが選択されるようにしたいが、うまくいかないのでロジックがおかしいと思う
-  sorted.forEach(function (p) {
-    var idx = str.indexOf(p.name);
-    var matched = false;
-    var matchStart = -1, matchEnd = -1;
+    //TODO:検索欄にコピペでパーツが選択されるようにしたいが、うまくいかないのでロジックがおかしいと思う
+    sorted.forEach(function (p) {
+        var idx = str.indexOf(p.name);
+        var matched = false;
+        var matchStart = -1, matchEnd = -1;
 
-    // 正式名での照合
-    if (idx >= 0 && !isOverlapping(idx, idx + p.name.length)) {
-        matched = true;
-        matchStart = idx;
-        matchEnd = idx + p.name.length;
-    }
+        // 正式名での照合
+        if (idx >= 0 && !isOverlapping(idx, idx + p.name.length)) {
+            matched = true;
+            matchStart = idx;
+            matchEnd = idx + p.name.length;
+        }
 
-    // 短縮名での照合
-    if (!matched) {
-        var shortName = p.name.replace(/（.*?）/g, '').trim();
-        if (shortName.length >= 1) {
-            var sidx = str.indexOf(shortName);
-            if (sidx >= 0 && !isOverlapping(sidx, sidx + shortName.length)) {
-                // 後ろの文字が英数字でないことを確認（誤マッチ防止）
-                var nextChar = str[sidx + shortName.length];
-                var isPartOfLonger = nextChar && /[a-zA-ZA-Za-z]/.test(nextChar);
-                if (!isPartOfLonger) {
-                    matched = true;
-                    matchStart = sidx;
-                    matchEnd = sidx + shortName.length;
+        // 短縮名での照合
+        if (!matched) {
+            var shortName = p.name.replace(/（.*?）/g, '').trim();
+            if (shortName.length >= 1) {
+                var sidx = str.indexOf(shortName);
+                if (sidx >= 0 && !isOverlapping(sidx, sidx + shortName.length)) {
+                    // 後ろの文字が英数字でないことを確認（誤マッチ防止）
+                    var nextChar = str[sidx + shortName.length];
+                    var isPartOfLonger = nextChar && /[a-zA-ZA-Za-z]/.test(nextChar);
+                    if (!isPartOfLonger) {
+                        matched = true;
+                        matchStart = sidx;
+                        matchEnd = sidx + shortName.length;
+                    }
                 }
             }
         }
-    }
 
-    if (matched) {
-        usedRanges.push({ start: matchStart, end: matchEnd });
-        if (p.cat === 'blade' && !result.blade) result.blade = p.name;
-        if (p.cat === 'ratchet' && !result.ratchet) result.ratchet = p.name;
-        if (p.cat === 'bit' && !result.bit) result.bit = p.name;
-        if (p.cat === 'combo' && !result.combo) result.combo = p.name;
-    }
-});
+        if (matched) {
+            usedRanges.push({ start: matchStart, end: matchEnd });
+            if (p.cat === 'blade' && !result.blade) result.blade = p.name;
+            if (p.cat === 'ratchet' && !result.ratchet) result.ratchet = p.name;
+            if (p.cat === 'bit' && !result.bit) result.bit = p.name;
+            if (p.cat === 'combo' && !result.combo) result.combo = p.name;
+        }
+    });
 
     return result;
 }
