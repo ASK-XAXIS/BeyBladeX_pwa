@@ -3420,7 +3420,7 @@ function renderQRReader() {
 
     // 戻るボタン
     html += '<div style="padding:12px 16px 4px;">'
-        + '<button class="btn-sm" onclick="renderPlayerCardHome();stopQRCamera()" '
+        + '<button class="btn-sm" onclick="stopQRCamera();renderPlayerCardHome()" '
         + 'style="padding:6px 12px;">'
         + '<i class="ti ti-arrow-left"></i> 戻る</button>'
         + '</div>';
