@@ -101,4 +101,4 @@ BeyBladeX_pwa/
 
 ## 作者
 
-- GitHub: [@ASK-XAXIS](https://github.com/ASK-XAXIS)
+- GitHub: [@RM](https://github.com/ASK-XAXIS)
