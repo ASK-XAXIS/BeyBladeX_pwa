@@ -1,447 +1,866 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>BX Manager</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="BX Manager" />
+    <link rel="apple-touch-icon" href="icon-180.png" />
+    <meta name="theme-color" content="#00cc44" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>BX Manager</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BX Manager">
-  <link rel="apple-touch-icon" href="icon-180.png">
-  <meta name="theme-color" content="#00cc44">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <script src="jsQR.js"></script>
-</head>
+    <!--QRコード生成ライブラリ-->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
-<body>
-  <!--下部タブ-->
-  <div class="nav">
-    <button class="nav-btn active" onclick="checkNavSwitch('home')" id="nav-home"><i class="ti ti-home"></i>ホーム</button>
-    <button class="nav-btn" onclick="checkNavSwitch('parts')" id="nav-parts"><i
-        class="ti ti-layout-grid"></i>パーツ</button>
-    <button class="nav-btn" onclick="checkNavSwitch('decks')" id="nav-decks"><i class="ti ti-shield"></i>マイデッキ</button>
-    <button class="nav-btn" onclick="checkNavSwitch('battle')" id="nav-battle"><i class="ti ti-sword"></i>対戦</button>
-    <button class="nav-btn" onclick="checkNavSwitch('timer')" id="nav-timer"><i class="ti ti-stopwatch"></i>計測</button>
-  </div>
+    <!--QRコード読み取りライブラリ-->
+    <script src="jsQR.js"></script>
+  </head>
 
-  <!-- ホーム画面 -->
-  <div class="screen active" id="screen-home">
-    <div style="background:var(--nav-bg);padding:14px 16px 10px;position:relative;overflow:hidden;">
-      <!-- X字背景 -->
+  <body>
+    <!--下部タブ-->
+    <div class="nav">
+      <button
+        class="nav-btn active"
+        onclick="checkNavSwitch('home')"
+        id="nav-home"
+      >
+        <i class="ti ti-home"></i>
+        ホーム
+      </button>
+
+      <button class="nav-btn" onclick="checkNavSwitch('parts')" id="nav-parts">
+        <i class="ti ti-layout-grid"></i>
+        パーツ
+      </button>
+
+      <button class="nav-btn" onclick="checkNavSwitch('decks')" id="nav-decks">
+        <i class="ti ti-shield"></i>
+        マイデッキ
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="checkNavSwitch('battle')"
+        id="nav-battle"
+      >
+        <i class="ti ti-sword"></i>
+        対戦
+      </button>
+
+      <button class="nav-btn" onclick="checkNavSwitch('timer')" id="nav-timer">
+        <i class="ti ti-stopwatch"></i>
+        計測
+      </button>
+    </div>
+
+    <!--メイン機能の画面　class="screen"をactiveにすると画面が表示される-->
+    <!-- ホーム画面 （初期画面）-->
+    <div class="screen active" id="screen-home">
       <div
-        style="position:absolute;inset:0;opacity:0.06;display:flex;align-items:center;justify-content:center;font-size:140px;font-weight:900;color:white;letter-spacing:-10px;pointer-events:none;user-select:none;">
-        X</div>
-      <div style="position:relative;z-index:1;">
-        <div style="font-size:11px;color:#888;letter-spacing:0.1em;margin-bottom:2px;">スピナー</div>
-        <div style="font-size:18px;font-weight:700;color:var(--accent);letter-spacing:0.05em;">パーツ管理</div>
-      </div>
-    </div>
-
-    <!-- 統計カード -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 12px;">
-      <div class="stat-card">
-        <div class="stat-card-num" id="home-parts-count">0</div>
-        <div class="stat-card-label">所持パーツ</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-num" id="home-decks-count">0</div>
-        <div class="stat-card-label">デッキ数</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-num" id="home-win-rate">—</div>
-        <div class="stat-card-label">勝率</div>
-      </div>
-    </div>
-
-    <!-- 勝敗サマリー -->
-    <div style="margin:0 16px 14px;">
-      <div class="home-section-title">対戦成績（全体）</div>
-      <div class="battle-summary" id="home-battle-summary">
-        <div class="battle-stat">
-          <span class="battle-num win" id="home-wins">0</span>
-          <span class="battle-label">勝</span>
+        style="
+          background: var(--nav-bg);
+          padding: 14px 16px 10px;
+          position: relative;
+          overflow: hidden;
+        "
+      >
+        <!-- X字背景 -->
+        <div
+          style="
+            position: absolute;
+            inset: 0;
+            opacity: 0.06;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 140px;
+            font-weight: 900;
+            color: white;
+            letter-spacing: -10px;
+            pointer-events: none;
+            user-select: none;
+          "
+        >
+          X
         </div>
-        <div class="battle-divider"></div>
-        <div class="battle-stat">
-          <span class="battle-num loss" id="home-losses">0</span>
-          <span class="battle-label">敗</span>
-        </div>
-        <div class="battle-divider"></div>
-        <div class="battle-stat">
-          <span class="battle-num draw" id="home-draws">0</span>
-          <span class="battle-label">引分</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- 計測最高記録 -->
-    <div class="home-recent-section">
-      <div class="home-section-title">⏱️ 計測最高記録</div>
-      <div id="home-best-time">
-        <div style="font-size:11px;color:var(--text3);">計測記録なし</div>
-      </div>
-    </div>
-
-    <!-- 最近追加パーツ -->
-    <div class="home-recent-section">
-      <div class="home-section-title">最近追加したパーツ</div>
-      <div class="home-recent-scroll" id="home-recent-parts">
-        <div style="font-size:11px;color:var(--text3);">パーツ未登録</div>
-      </div>
-    </div>
-
-    <!-- 最近追加デッキ -->
-    <div class="home-recent-section">
-      <div class="home-section-title">最近追加したデッキ</div>
-      <div id="home-recent-decks">
-        <div style="font-size:11px;color:var(--text3);">デッキ未登録</div>
-      </div>
-    </div>
-
-    <!-- 試合用デッキ -->
-    <div style="margin:0 16px 80px;">
-      <div class="home-section-title">試合用デッキ</div>
-      <div id="home-battle-decks">
-        <div class="home-empty">試合用デッキが登録されていません<br>マイデッキから「試合用に登録」してください</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- パーツ管理画面 -->
-  <div class="screen" id="screen-parts">
-    <div
-      style="background:var(--nav-bg);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:10px;color:#888;letter-spacing:0.08em;">スピナー</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent);">パーツ管理</div>
-      </div>
-      <button class="btn-primary" onclick="openAddPart()" style="background:var(--accent);color:#000;"><i
-          class="ti ti-plus"></i>追加</button>
-    </div>
-    <div class="stats-row" id="stats-row"></div>
-    <div class="search-wrap" id="parts-search-wrap">
-      <i class="ti ti-search search-icon"></i>
-      <input class="search-input" id="parts-search-inp" placeholder="パーツ名で検索..." oninput="onPartsSearch(this.value)"
-        autocomplete="off" list="parts-search-list">
-      <datalist id="parts-search-list"></datalist>
-      <i class="ti ti-x search-clear" onclick="clearPartsSearch()"></i>
-    </div>
-    <div class="tabs" id="main-tabs"></div>
-    <div id="sub-tabs-area"></div>
-    <div class="parts-list" id="parts-list"></div>
-  </div>
-
-  <!-- デッキ管理画面 -->
-  <div class="screen" id="screen-decks">
-    <div
-      style="background:var(--nav-bg);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:10px;color:#888;letter-spacing:0.08em;">スピナー</div>
-        <div style="font-size:16px;font-weight:700;color:var(--accent);">マイデッキ</div>
-      </div>
-      <button class="btn-primary" onclick="openAddDeck()" style="background:var(--accent);color:#000;"><i
-          class="ti ti-plus"></i>新規</button>
-    </div>
-    <div class="deck-list" id="deck-list"></div>
-  </div>
-
-  <!-- 計測モード画面 -->
-  <div class="screen" id="screen-timer">
-    <div style="background:var(--nav-bg);padding:14px 16px 10px;">
-      <div style="font-size:10px;color:#888;letter-spacing:0.08em;">スピナー</div>
-      <div style="font-size:16px;font-weight:700;color:var(--accent);">計測モード</div>
-    </div>
-    <div id="timer-content"></div>
-  </div>
-
-  <!-- 対戦モード画面 -->
-  <div class="screen" id="screen-battle">
-    <div class="top-bar">
-      <h2 id="battle-screen-title" style="color:var(--accent);">対戦モード</h2>
-    </div>
-    <div id="battle-content"></div>
-  </div>
-
-
-  <!-- パーツ追加モーダル -->
-  <div class="modal-overlay hidden" id="modal-part">
-    <div class="modal">
-      <h3>パーツを追加</h3>
-      <p style="font-size:11px;color:var(--text2);margin-bottom:14px;">カテゴリを選んでパーツを登録します</p>
-
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="part-add-btn" onclick="openAddPicker('blade')">
-          <span class="badge blade" style="font-size:11px;">ブレード</span>
-          <span>BX / UX / CX を追加</span>
-          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--text3);"></i>
-        </button>
-        <button class="part-add-btn" onclick="openAddPicker('ratchet')">
-          <span class="badge ratchet" style="font-size:11px;">ラチェット</span>
-          <span>ラチェットを追加</span>
-          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--text3);"></i>
-        </button>
-        <button class="part-add-btn" onclick="openAddPicker('bit')">
-          <span class="badge bit" style="font-size:11px;">ビット</span>
-          <span>ビットを追加</span>
-          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--text3);"></i>
-        </button>
-        <button class="part-add-btn" onclick="openAddPicker('combo')">
-          <span class="badge combo" style="font-size:11px;">一体型ビット</span>
-          <span>ラチェット一体型ビットを追加</span>
-          <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--text3);"></i>
-        </button>
-      </div>
-
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-part')">閉じる</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- パーツ追加ピッカー -->
-  <div class="modal-overlay hidden" id="modal-add-picker">
-    <div class="modal">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <button class="btn-sm" onclick="closeModal('modal-add-picker')" style="padding:4px 10px;"><i
-            class="ti ti-arrow-left"></i></button>
-        <h3 style="margin:0;" id="add-picker-title">パーツを選択</h3>
-      </div>
-
-      <!-- ブレードライン選択 -->
-      <div id="add-picker-blade-line" style="display:none;">
-        <label class="form-label" style="margin-top:0;">ブレードライン</label>
-        <div class="chip-row" style="margin-bottom:12px;">
-          <span class="sel-chip" id="apbl-bx" onclick="setAddPickerBladeLine('bx')">BX</span>
-          <span class="sel-chip" id="apbl-ux" onclick="setAddPickerBladeLine('ux')">UX</span>
-          <span class="sel-chip" id="apbl-cx" onclick="setAddPickerBladeLine('cx')">CX</span>
-        </div>
-      </div>
-
-      <!-- CXパターン -->
-      <div id="add-picker-cx-pattern" style="display:none;">
-        <label class="form-label" style="margin-top:0;">CX組み合わせパターン</label>
-        <div class="mode-toggle" style="margin-bottom:12px;">
-          <button class="mode-btn active" id="apcxp-3" onclick="setAddPickerCxPat(3)">3パーツ型</button>
-          <button class="mode-btn" id="apcxp-4" onclick="setAddPickerCxPat(4)">4パーツ型</button>
-        </div>
-      </div>
-
-      <div id="add-picker-main-area"></div>
-
-      <!-- 所持数・メモ -->
-      <div id="add-picker-detail"
-        style="display:none;margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border);">
-        <label class="form-label" style="margin-top:0;">選択中のパーツ</label>
-        <div id="add-picker-selected-names"
-          style="font-size:12px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
-        <div style="display:flex;gap:8px;">
-          <div style="flex:1;">
-            <label class="form-label" style="margin-top:0;">所持数</label>
-            <input class="form-input" id="add-picker-qty" type="number" min="0" value="1">
-          </div>
-          <div style="flex:2;">
-            <label class="form-label" style="margin-top:0;">メモ</label>
-            <input class="form-input" id="add-picker-memo" placeholder="用途・特徴など">
+        <div style="position: relative; z-index: 1">
+          <div
+            style="
+              font-size: 18px;
+              font-weight: 700;
+              color: var(--accent);
+              letter-spacing: 0.05em;
+            "
+          >
+            パーツ管理
           </div>
         </div>
       </div>
 
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-add-picker')">キャンセル</button>
-        <button class="btn-save" id="add-picker-done-btn" onclick="addPickerDone()" disabled>登録</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- デッキ作成モーダル -->
-  <div class="modal-overlay hidden" id="modal-deck">
-    <div class="modal">
-      <h3>デッキを作成</h3>
-      <label class="form-label" style="margin-top:0;">デッキ名（省略で自動生成）</label>
-      <input class="form-input" id="deck-name-inp" oninput="onDeckNameInput(this.value)" placeholder="自動生成されます">
-      <div class="name-hint" id="deck-name-hint"></div>
-
-      <label class="form-label">パーツ選択モード</label>
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="dt-owned" onclick="setDeckMode('owned')">所持パーツから選ぶ</button>
-        <button class="mode-btn" id="dt-all" onclick="setDeckMode('all')">全パーツから選ぶ</button>
-      </div>
-
-      <!-- ブレード選択ボタンエリア -->
-      <label class="form-label">ブレード</label>
-      <div id="blade-sel-display" class="part-sel-display" onclick="openPartPicker('blade')">
-        <span id="blade-sel-text" class="part-sel-placeholder">タップして選択</span>
-        <i class="ti ti-chevron-right" style="color:var(--text3);"></i>
-      </div>
-
-      <!-- ラチェット一体型ビット -->
-      <label class="form-label">ラチェット一体型ビット <span
-          style="font-size:10px;color:var(--text3);">（選ぶとラチェット+ビット兼用）</span></label>
-      <div id="combo-sel-display" class="part-sel-display" onclick="openPartPicker('combo')">
-        <span id="combo-sel-text" class="part-sel-placeholder">タップして選択（任意）</span>
-        <i class="ti ti-chevron-right" style="color:var(--text3);"></i>
-      </div>
-
-      <!-- ラチェット -->
-      <div id="ratchet-sel-area">
-        <label class="form-label">ラチェット</label>
-        <div id="ratchet-sel-display" class="part-sel-display" onclick="openPartPicker('ratchet')">
-          <span id="ratchet-sel-text" class="part-sel-placeholder">タップして選択</span>
-          <i class="ti ti-chevron-right" style="color:var(--text3);"></i>
+      <!-- 統計カード -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          padding: 0 16px 12px;
+        "
+      >
+        <div class="stat-card">
+          <div class="stat-card-num" id="home-parts-count">0</div>
+          <div class="stat-card-label">所持パーツ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="home-decks-count">0</div>
+          <div class="stat-card-label">デッキ数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="home-win-rate">—</div>
+          <div class="stat-card-label">勝率</div>
         </div>
       </div>
 
-      <!-- ビット -->
-      <div id="bit-sel-area">
-        <label class="form-label">ビット</label>
-        <div id="bit-sel-display" class="part-sel-display" onclick="openPartPicker('bit')">
-          <span id="bit-sel-text" class="part-sel-placeholder">タップして選択</span>
-          <i class="ti ti-chevron-right" style="color:var(--text3);"></i>
+      <!-- 勝敗成績 -->
+      <div style="margin: 0 16px 14px">
+        <div class="home-section-title">対戦成績（全体）</div>
+        <div class="battle-summary" id="home-battle-summary">
+          <div class="battle-stat">
+            <span class="battle-num win" id="home-wins">0</span>
+            <span class="battle-label">勝</span>
+          </div>
+          <div class="battle-divider"></div>
+          <div class="battle-stat">
+            <span class="battle-num loss" id="home-losses">0</span>
+            <span class="battle-label">敗</span>
+          </div>
+          <div class="battle-divider"></div>
+          <div class="battle-stat">
+            <span class="battle-num draw" id="home-draws">0</span>
+            <span class="battle-label">引分</span>
+          </div>
         </div>
       </div>
 
-      <!-- 所持数・メモ -->
-      <div id="missing-warn" style="display:none;" class="missing-warn"><i class="ti ti-alert-triangle"></i>未所持のパーツあり
-      </div>
-      <div id="otype-warn"
-        style="display:none;color:var(--danger);font-size:10px;margin-bottom:8px;align-items:center;gap:4px;"><i
-          class="ti ti-alert-triangle"></i>O型専用ブレードには通常ラチェット使用不可</div>
-
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-deck')">キャンセル</button>
-        <button class="btn-save" onclick="saveDeck()">保存</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PART PICKER MODAL -->
-  <div class="modal-overlay hidden" id="modal-picker">
-    <div class="modal">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <button class="btn-sm" onclick="closeModal('modal-picker')" style="padding:4px 10px;"><i
-            class="ti ti-arrow-left"></i></button>
-        <h3 style="margin:0;" id="picker-title">選択</h3>
-      </div>
-
-      <!-- ブレードライン選択 (blade専用) -->
-      <div id="picker-blade-line" style="display:none;">
-        <label class="form-label" style="margin-top:0;">ブレードライン</label>
-        <div class="chip-row" style="margin-bottom:14px;">
-          <span class="sel-chip" id="pbl-bx" onclick="setPickerBladeLine('bx')">BX</span>
-          <span class="sel-chip" id="pbl-ux" onclick="setPickerBladeLine('ux')">UX</span>
-          <span class="sel-chip" id="pbl-cx" onclick="setPickerBladeLine('cx')">CX</span>
+      <!-- 計測最高記録 -->
+      <div class="home-recent-section">
+        <div class="home-section-title">⏱️ 計測最高記録</div>
+        <div id="home-best-time">
+          <div style="font-size: 11px; color: var(--text3)">計測記録なし</div>
         </div>
       </div>
 
-      <!-- CXパターン選択 -->
-      <div id="picker-cx-pattern" style="display:none;">
-        <label class="form-label" style="margin-top:0;">CX組み合わせパターン</label>
-        <div class="mode-toggle" style="margin-bottom:12px;">
-          <button class="mode-btn active" id="pcxp-3" onclick="setPickerCxPat(3)">3パーツ型</button>
-          <button class="mode-btn" id="pcxp-4" onclick="setPickerCxPat(4)">4パーツ型</button>
+      <!-- 最近追加パーツ -->
+      <div class="home-recent-section">
+        <div class="home-section-title">最近追加したパーツ</div>
+        <div class="home-recent-scroll" id="home-recent-parts">
+          <div style="font-size: 11px; color: var(--text3)">パーツ未登録</div>
         </div>
       </div>
 
-      <!-- メインの選択リスト -->
-      <div id="picker-main-area"></div>
-
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-picker')">キャンセル</button>
-        <button class="btn-save" id="picker-done-btn" onclick="pickerDone()" disabled>完了</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ポップアップ画面 -->
-  <div class="modal-overlay hidden" id="modal-edit-part">
-    <div class="modal">
-      <h3>パーツを編集</h3>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
-        <div class="thumb-upload" id="edit-thumb-preview" onclick="document.getElementById('edit-thumb-file').click()"
-          style="width:72px;height:72px;border-radius:10px;background:var(--bg3);border:1px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:3px;font-size:9px;color:var(--text2);overflow:hidden;flex-shrink:0;">
-          <i class="ti ti-camera" style="font-size:22px;"></i><span>画像</span>
-        </div>
-        <input type="file" id="edit-thumb-file" accept="image/*" style="display:none" onchange="handleEditThumb(event)">
-        <div style="flex:1;">
-          <div id="edit-part-name" style="font-size:14px;font-weight:500;margin-bottom:4px;"></div>
-          <div id="edit-part-badges"></div>
-          <button class="btn-sm danger" id="edit-del-img-btn" onclick="deleteEditThumb()"
-            style="font-size:10px;padding:3px 8px;margin-top:6px;display:none;"><i class="ti ti-trash"></i>
-            画像削除</button>
+      <!-- 最近追加デッキ -->
+      <div class="home-recent-section">
+        <div class="home-section-title">最近追加したデッキ</div>
+        <div id="home-recent-decks">
+          <div style="font-size: 11px; color: var(--text3)">デッキ未登録</div>
         </div>
       </div>
-      <label class="form-label" style="margin-top:0;">メモ（500文字まで）</label>
-      <textarea class="form-input" id="edit-memo-inp" rows="6" maxlength="500" placeholder="用途・特徴・対戦記録など自由に記入"
-        style="resize:none;line-height:1.6;"></textarea>
-      <div style="text-align:right;font-size:10px;color:var(--text3);margin-top:2px;" id="edit-memo-count">0 / 500</div>
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-edit-part')">キャンセル</button>
-        <button class="btn-save" onclick="saveEditPart()">保存</button>
+
+      <!-- 試合用デッキ -->
+      <div style="margin: 0 16px 80px">
+        <div class="home-section-title">試合用デッキ</div>
+        <div id="home-battle-decks">
+          <div class="home-empty">
+            試合用デッキが登録されていません<br />マイデッキから「試合用に登録」してください
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 確認ナビゲーションモーダル -->
-  <div class="modal-overlay hidden" id="modal-confirm-nav">
-    <div class="modal" style="max-height:40vh;">
-      <h3 style="margin-bottom:12px;">ページを移動しますか？</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">入力中の内容があります。移動すると入力内容は失われます。</p>
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="confirmNavNo()">いいえ</button>
-        <button class="btn-save" onclick="confirmNavYes()">はい</button>
+    <!-- パーツ管理画面 -->
+    <div class="screen" id="screen-parts">
+      <div
+        style="
+          background: var(--nav-bg);
+          padding: 14px 16px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <div style="font-size: 16px; font-weight: 700; color: var(--accent)">
+            パーツ管理
+          </div>
+        </div>
+        <button
+          class="btn-primary"
+          onclick="openAddPart()"
+          style="background: var(--accent); color: #000"
+        >
+          <i class="ti ti-plus"></i>追加
+        </button>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="search-wrap" id="parts-search-wrap">
+        <i class="ti ti-search search-icon"></i>
+        <input
+          class="search-input"
+          id="parts-search-inp"
+          placeholder="パーツ名で検索..."
+          oninput="onPartsSearch(this.value)"
+          autocomplete="off"
+          list="parts-search-list"
+        />
+        <datalist id="parts-search-list"></datalist>
+        <i class="ti ti-x search-clear" onclick="clearPartsSearch()"></i>
+      </div>
+      <div class="tabs" id="main-tabs"></div>
+      <div id="sub-tabs-area"></div>
+      <div class="parts-list" id="parts-list"></div>
+    </div>
+
+    <!-- マイデッキ画面 -->
+    <div class="screen" id="screen-decks">
+      <div
+        style="
+          background: var(--nav-bg);
+          padding: 14px 16px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <div style="font-size: 16px; font-weight: 700; color: var(--accent)">
+            マイデッキ
+          </div>
+        </div>
+
+        <button
+          class="btn-primary"
+          onclick="openAddDeck()"
+          style="background: var(--accent); color: #000"
+        >
+          <i class="ti ti-plus"></i>
+          新規
+        </button>
+      </div>
+      <!--デッキ表示div：リストが増えると追加されていく-->
+      <div class="deck-list" id="deck-list"></div>
+    </div>
+
+    <!-- 対戦モード画面 -->
+    <div class="screen" id="screen-battle">
+      <div class="top-bar">
+        <h2 id="battle-screen-title" style="color: var(--accent)">
+          対戦モード
+        </h2>
+      </div>
+      <div id="battle-content"></div>
+    </div>
+
+    <!-- 計測モード画面 -->
+    <div class="screen" id="screen-timer">
+      <div style="background: var(--nav-bg); padding: 14px 16px 10px">
+        <div style="font-size: 16px; font-weight: 700; color: var(--accent)">
+          計測モード
+        </div>
+      </div>
+      <div id="timer-content"></div>
+    </div>
+
+    <!-- パーツ追加モーダル 使用箇所:パーツ管理モード-->
+    <div class="modal-overlay hidden" id="modal-part">
+      <div class="modal">
+        <h3>パーツを追加</h3>
+        <p style="font-size: 11px; color: var(--text2); margin-bottom: 14px">
+          カテゴリを選んでパーツを登録します
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <button class="part-add-btn" onclick="openAddPicker('blade')">
+            <span class="badge blade" style="font-size: 11px">ブレード</span>
+            <span>BX / UX / CX を追加</span>
+            <i
+              class="ti ti-chevron-right"
+              style="margin-left: auto; color: var(--text3)"
+            ></i>
+          </button>
+
+          <button class="part-add-btn" onclick="openAddPicker('ratchet')">
+            <span class="badge ratchet" style="font-size: 11px"
+              >ラチェット</span
+            >
+            <span>ラチェットを追加</span>
+            <i
+              class="ti ti-chevron-right"
+              style="margin-left: auto; color: var(--text3)"
+            ></i>
+          </button>
+
+          <button class="part-add-btn" onclick="openAddPicker('bit')">
+            <span class="badge bit" style="font-size: 11px">ビット</span>
+            <span>ビットを追加</span>
+            <i
+              class="ti ti-chevron-right"
+              style="margin-left: auto; color: var(--text3)"
+            ></i>
+          </button>
+
+          <button class="part-add-btn" onclick="openAddPicker('combo')">
+            <span class="badge combo" style="font-size: 11px"
+              >一体型ビット</span
+            >
+            <span>ラチェット一体型ビットを追加</span>
+            <i
+              class="ti ti-chevron-right"
+              style="margin-left: auto; color: var(--text3)"
+            ></i>
+          </button>
+        </div>
+
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-part')">
+            閉じる
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- デッキ名変更モーダル -->
-  <div class="modal-overlay hidden" id="modal-rename">
-    <div class="modal" style="max-height:50vh;">
-      <h3>デッキ名を変更</h3>
-      <label class="form-label" style="margin-top:0;">新しいデッキ名</label>
-      <input class="form-input" id="rename-inp">
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-rename')">キャンセル</button>
-        <button class="btn-save" onclick="saveRename()">変更</button>
+    <!-- パーツ追加モーダル　使用箇所：パーツ管理モード -->
+    <div class="modal-overlay hidden" id="modal-add-picker">
+      <div class="modal">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+          "
+        >
+          <button
+            class="btn-sm"
+            onclick="checkNavReturn()"
+            style="padding: 4px 10px"
+          >
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <h3 style="margin: 0" id="add-picker-title">パーツを選択</h3>
+        </div>
+
+        <!-- ブレードライン選択 -->
+        <div id="add-picker-blade-line" style="display: none">
+          <label class="form-label" style="margin-top: 0">ブレードライン</label>
+          <div class="chip-row" style="margin-bottom: 12px">
+            <span
+              class="sel-chip"
+              id="apbl-bx"
+              onclick="setAddPickerBladeLine('bx')"
+              >BX</span
+            >
+            <span
+              class="sel-chip"
+              id="apbl-ux"
+              onclick="setAddPickerBladeLine('ux')"
+              >UX</span
+            >
+            <span
+              class="sel-chip"
+              id="apbl-cx"
+              onclick="setAddPickerBladeLine('cx')"
+              >CX</span
+            >
+          </div>
+        </div>
+
+        <!-- CXパターン 使用箇所：ブレードラインで「CX」を選択した場合-->
+        <div id="add-picker-cx-pattern" style="display: none">
+          <label class="form-label" style="margin-top: 0"
+            >CX組み合わせパターン</label
+          >
+
+          <div class="mode-toggle" style="margin-bottom: 12px">
+            <button
+              class="mode-btn active"
+              id="apcxp-3"
+              onclick="setAddPickerCxPat(3)"
+            >
+              3パーツ型
+            </button>
+
+            <button
+              class="mode-btn"
+              id="apcxp-4"
+              onclick="setAddPickerCxPat(4)"
+            >
+              4パーツ型
+            </button>
+          </div>
+        </div>
+
+        <!-- パーツアイコン用div ：データベースにパーツデータがあるとココにリスト表示される -->
+        <div id="add-picker-main-area"></div>
+
+        <!-- パーツを選択すると、ここに選択中のパーツ名が表示される -->
+        <div
+          id="add-picker-detail"
+          style="
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 0.5px solid var(--border);
+          "
+        >
+          <label class="form-label" style="margin-top: 0">選択中のパーツ</label>
+          <div
+            id="add-picker-selected-names"
+            style="
+              font-size: 12px;
+              color: var(--accent);
+              margin-bottom: 10px;
+              line-height: 1.6;
+            "
+          ></div>
+
+          <!-- 所持数・メモ -->
+          <div style="display: flex; gap: 8px">
+            <div style="flex: 1">
+              <label class="form-label" style="margin-top: 0">所持数</label>
+              <input
+                class="form-input"
+                id="add-picker-qty"
+                type="number"
+                min="0"
+                value="1"
+              />
+            </div>
+            <div style="flex: 2">
+              <label class="form-label" style="margin-top: 0">メモ</label>
+              <input
+                class="form-input"
+                id="add-picker-memo"
+                placeholder="用途・特徴など"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="checkNavReturn()">
+            キャンセル
+          </button>
+
+          <button
+            class="btn-save"
+            id="add-picker-done-btn"
+            onclick="addPickerDone()"
+            disabled
+          >
+            登録
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- デッキ選択モーダル -->
-  <div class="modal-overlay hidden" id="modal-battle-deck">
-    <div class="modal">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <button class="btn-sm" onclick="closeBattleDeckModal()" style="padding:4px 10px;"><i
-            class="ti ti-arrow-left"></i></button>
-        <h3 style="margin:0;">デッキを選択</h3>
-      </div>
-      <div id="battle-deck-modal-content"></div>
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeBattleDeckModal()">キャンセル</button>
+    <!-- デッキ作成モーダル 使用箇所：マイデッキモード（+新規）ボタンを押した後-->
+    <div class="modal-overlay hidden" id="modal-deck">
+      <div class="modal">
+        <h3>デッキを作成</h3>
+        <label class="form-label" style="margin-top: 0"
+          >デッキ名（省略で自動生成）</label
+        >
+        <input
+          class="form-input"
+          id="deck-name-inp"
+          oninput="onDeckNameInput(this.value)"
+          placeholder="自動生成されます"
+        />
+        <div class="name-hint" id="deck-name-hint"></div>
+
+        <label class="form-label">パーツ選択モード</label>
+        <div class="mode-toggle">
+          <button
+            class="mode-btn active"
+            id="dt-owned"
+            onclick="setDeckMode('owned')"
+          >
+            所持パーツから選ぶ
+          </button>
+
+          <button class="mode-btn" id="dt-all" onclick="setDeckMode('all')">
+            全パーツから選ぶ
+          </button>
+        </div>
+
+        <!-- ブレード選択ボタンエリア -->
+        <label class="form-label">ブレード</label>
+        <div
+          id="blade-sel-display"
+          class="part-sel-display"
+          onclick="openPartPicker('blade')"
+        >
+          <span id="blade-sel-text" class="part-sel-placeholder"
+            >タップして選択</span
+          >
+          <i class="ti ti-chevron-right" style="color: var(--text3)"></i>
+        </div>
+
+        <!-- ラチェット -->
+        <div id="ratchet-sel-area">
+          <label class="form-label">ラチェット</label>
+          <div
+            id="ratchet-sel-display"
+            class="part-sel-display"
+            onclick="openPartPicker('ratchet')"
+          >
+            <span id="ratchet-sel-text" class="part-sel-placeholder"
+              >タップして選択</span
+            >
+            <i class="ti ti-chevron-right" style="color: var(--text3)"></i>
+          </div>
+        </div>
+
+        <!-- ビット -->
+        <div id="bit-sel-area">
+          <label class="form-label">ビット</label>
+          <div
+            id="bit-sel-display"
+            class="part-sel-display"
+            onclick="openPartPicker('bit')"
+          >
+            <span id="bit-sel-text" class="part-sel-placeholder"
+              >タップして選択</span
+            >
+            <i class="ti ti-chevron-right" style="color: var(--text3)"></i>
+          </div>
+        </div>
+
+        <!-- ラチェット一体型ビット -->
+        <label class="form-label"
+          >ラチェット一体型ビット
+          <span style="font-size: 10px; color: var(--text3)"
+            >（選ぶとラチェット+ビット兼用）</span
+          ></label
+        >
+        <div
+          id="combo-sel-display"
+          class="part-sel-display"
+          onclick="openPartPicker('combo')"
+        >
+          <span id="combo-sel-text" class="part-sel-placeholder"
+            >タップして選択（任意）</span
+          >
+          <i class="ti ti-chevron-right" style="color: var(--text3)"></i>
+        </div>
+
+        <!-- 所持数・メモ -->
+        <div id="missing-warn" style="display: none" class="missing-warn">
+          <i class="ti ti-alert-triangle"></i>未所持のパーツあり
+        </div>
+        <div
+          id="otype-warn"
+          style="
+            display: none;
+            color: var(--danger);
+            font-size: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+            gap: 4px;
+          "
+        >
+          <i class="ti ti-alert-triangle"></i
+          >O型専用ブレードには通常ラチェット使用不可
+        </div>
+
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-deck')">
+            キャンセル
+          </button>
+          <button class="btn-save" onclick="saveDeck()">保存</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 削除確認モーダル -->
-  <div class="modal-overlay hidden" id="modal-del-part">
-    <div class="modal" style="max-height:40vh;">
-      <h3 style="margin-bottom:10px;">パーツを削除</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;" id="del-part-msg">削除しますか？</p>
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal('modal-del-part')">いいえ</button>
-        <button class="btn-save" style="background:var(--danger);color:#fff;font-weight:500;"
-          onclick="confirmDelPart()">削除する</button>
+    <!-- パーツ追加モーダル 使用箇所:マイデッキモード -->
+    <div class="modal-overlay hidden" id="modal-picker">
+      <div class="modal">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+          "
+        >
+          <button
+            class="btn-sm"
+            onclick="closeModal('modal-picker')"
+            style="padding: 4px 10px"
+          >
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <h3 style="margin: 0" id="picker-title">選択</h3>
+        </div>
+
+        <!-- ブレードライン選択 (blade専用) -->
+        <div id="picker-blade-line" style="display: none">
+          <label class="form-label" style="margin-top: 0">ブレードライン</label>
+          <div class="chip-row" style="margin-bottom: 14px">
+            <span
+              class="sel-chip"
+              id="pbl-bx"
+              onclick="setPickerBladeLine('bx')"
+              >BX</span
+            >
+            <span
+              class="sel-chip"
+              id="pbl-ux"
+              onclick="setPickerBladeLine('ux')"
+              >UX</span
+            >
+            <span
+              class="sel-chip"
+              id="pbl-cx"
+              onclick="setPickerBladeLine('cx')"
+              >CX</span
+            >
+          </div>
+        </div>
+
+        <!-- CXパターン選択 -->
+        <div id="picker-cx-pattern" style="display: none">
+          <label class="form-label" style="margin-top: 0"
+            >CX組み合わせパターン</label
+          >
+          <div class="mode-toggle" style="margin-bottom: 12px">
+            <button
+              class="mode-btn active"
+              id="pcxp-3"
+              onclick="setPickerCxPat(3)"
+            >
+              3パーツ型
+            </button>
+            <button class="mode-btn" id="pcxp-4" onclick="setPickerCxPat(4)">
+              4パーツ型
+            </button>
+          </div>
+        </div>
+
+        <!-- メインの選択リスト -->
+        <div id="picker-main-area"></div>
+
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-picker')">
+            キャンセル
+          </button>
+          <button
+            class="btn-save"
+            id="picker-done-btn"
+            onclick="pickerDone()"
+            disabled
+          >
+            完了
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="toast" id="toast"></div>
+    <!-- ポップアップ画面 -->
+    <div class="modal-overlay hidden" id="modal-edit-part">
+      <div class="modal">
+        <h3>パーツを編集</h3>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+          "
+        >
+          <div
+            class="thumb-upload"
+            id="edit-thumb-preview"
+            onclick="document.getElementById('edit-thumb-file').click()"
+            style="
+              width: 72px;
+              height: 72px;
+              border-radius: 10px;
+              background: var(--bg3);
+              border: 1px dashed var(--border2);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              gap: 3px;
+              font-size: 9px;
+              color: var(--text2);
+              overflow: hidden;
+              flex-shrink: 0;
+            "
+          >
+            <i class="ti ti-camera" style="font-size: 22px"></i
+            ><span>画像</span>
+          </div>
+          <input
+            type="file"
+            id="edit-thumb-file"
+            accept="image/*"
+            style="display: none"
+            onchange="handleEditThumb(event)"
+          />
+          <div style="flex: 1">
+            <div
+              id="edit-part-name"
+              style="font-size: 14px; font-weight: 500; margin-bottom: 4px"
+            ></div>
+            <div id="edit-part-badges"></div>
+            <button
+              class="btn-sm danger"
+              id="edit-del-img-btn"
+              onclick="deleteEditThumb()"
+              style="
+                font-size: 10px;
+                padding: 3px 8px;
+                margin-top: 6px;
+                display: none;
+              "
+            >
+              <i class="ti ti-trash"></i> 画像削除
+            </button>
+          </div>
+        </div>
+        <label class="form-label" style="margin-top: 0"
+          >メモ（500文字まで）</label
+        >
+        <textarea
+          class="form-input"
+          id="edit-memo-inp"
+          rows="6"
+          maxlength="500"
+          placeholder="用途・特徴・対戦記録など自由に記入"
+          style="resize: none; line-height: 1.6"
+        ></textarea>
+        <div
+          style="
+            text-align: right;
+            font-size: 10px;
+            color: var(--text3);
+            margin-top: 2px;
+          "
+          id="edit-memo-count"
+        >
+          0 / 500
+        </div>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-edit-part')">
+            キャンセル
+          </button>
+          <button class="btn-save" onclick="saveEditPart()">保存</button>
+        </div>
+      </div>
+    </div>
 
-  <script src="app.js"></script>
-</body>
+    <!-- 確認ナビゲーションモーダル -->
+    <div class="modal-overlay hidden" id="modal-confirm-nav">
+      <div class="modal" style="max-height: 40vh">
+        <h3 style="margin-bottom: 12px">ページを移動しますか？</h3>
+        <p style="font-size: 13px; color: var(--text2); margin-bottom: 16px">
+          入力中の内容があります。移動すると入力内容は失われます。
+        </p>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="confirmNavNo()">いいえ</button>
+          <button class="btn-save" onclick="confirmNavYes()">はい</button>
+        </div>
+      </div>
+    </div>
 
+    <!-- デッキ名変更モーダル -->
+    <div class="modal-overlay hidden" id="modal-rename">
+      <div class="modal" style="max-height: 50vh">
+        <h3>デッキ名を変更</h3>
+        <label class="form-label" style="margin-top: 0">新しいデッキ名</label>
+        <input class="form-input" id="rename-inp" />
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-rename')">
+            キャンセル
+          </button>
+          <button class="btn-save" onclick="saveRename()">変更</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- デッキ選択モーダル -->
+    <div class="modal-overlay hidden" id="modal-battle-deck">
+      <div class="modal">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+          "
+        >
+          <button
+            class="btn-sm"
+            onclick="closeBattleDeckModal()"
+            style="padding: 4px 10px"
+          >
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <h3 style="margin: 0">デッキを選択</h3>
+        </div>
+        <div id="battle-deck-modal-content"></div>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeBattleDeckModal()">
+            キャンセル
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 削除確認モーダル -->
+    <div class="modal-overlay hidden" id="modal-del-part">
+      <div class="modal" style="max-height: 40vh">
+        <h3 style="margin-bottom: 10px">パーツを削除</h3>
+        <p
+          style="font-size: 13px; color: var(--text2); margin-bottom: 16px"
+          id="del-part-msg"
+        >
+          削除しますか？
+        </p>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal('modal-del-part')">
+            いいえ
+          </button>
+          <button
+            class="btn-save"
+            style="background: var(--danger); color: #fff; font-weight: 500"
+            onclick="confirmDelPart()"
+          >
+            削除する
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+  </body>
 </html>
