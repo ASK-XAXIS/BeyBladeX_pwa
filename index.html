@@ -777,15 +777,44 @@
     </div>
 
     <!-- 確認ナビゲーションモーダル -->
-    <div class="modal-overlay hidden" id="modal-confirm-nav">
-      <div class="modal" style="max-height: 40vh">
-        <h3 style="margin-bottom: 12px">ページを移動しますか？</h3>
-        <p style="font-size: 13px; color: var(--text2); margin-bottom: 16px">
-          入力中の内容があります。移動すると入力内容は失われます。
+    <div
+      class="modal-overlay hidden"
+      id="modal-confirm-nav"
+      style="align-items: center"
+    >
+      <div
+        class="modal"
+        style="
+          max-height: 60vh;
+          max-width: 340px;
+          border-radius: 16px;
+          padding: 28px 24px;
+        "
+      >
+        <h3 style="margin-bottom: 12px; font-size: 18px">
+          入力内容を破棄しますか？
+        </h3>
+        <p
+          style="
+            font-size: 14px;
+            color: var(--text2);
+            margin-bottom: 20px;
+            line-height: 1.7;
+          "
+        >
+          選択・入力中の内容があります。<br />キャンセルすると内容が失われます。
         </p>
         <div class="modal-btns">
-          <button class="btn-cancel" onclick="confirmNavNo()">いいえ</button>
-          <button class="btn-save" onclick="confirmNavYes()">はい</button>
+          <button class="btn-cancel" onclick="confirmNavNo()">
+            入力を続ける
+          </button>
+          <button
+            class="btn-save"
+            onclick="confirmNavYes()"
+            style="background: var(--danger); color: #fff"
+          >
+            破棄する
+          </button>
         </div>
       </div>
     </div>
