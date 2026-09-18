@@ -14,41 +14,11 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 
 ## スクリーンショット
 
-<p>メイン画面</p>
+<p>↓メイン画面</p>
 <p>
 <img src="docs/screenshot1.PNG" width="150" height="150">
 <img src="docs/screenshot2.PNG" width="150" height="150">
 </p>
-<p>パーツ管理画面</p>
-<p>
-<img src="docs/screenshot3.PNG" width="150" height="150">
-<img src="docs/screenshot4.PNG" width="150" height="150">
-<img src="docs/screenshot5.PNG" width="150" height="150">
-<img src="docs/screenshot6.PNG" width="150" height="150">
-<img src="docs/screenshot7.PNG" width="150" height="150">
-</p>
-<p>マイデッキ画面</p>
-<p>
-<img src="docs/screenshot8.PNG" width="150" height="150">
-<img src="docs/screenshot9.PNG" width="150" height="150">
-<img src="docs/screenshot10.PNG" width="150" height="150">
-<img src="docs/screenshot11.PNG" width="150" height="150">
-<img src="docs/screenshot12.PNG" width="150" height="150">
-</p>
-<p>対戦モード画面</p>
-<p>
-<img src="docs/screenshot13.PNG" width="150" height="150">
-<img src="docs/screenshot14.PNG" width="150" height="150">
-<img src="docs/screenshot15.PNG" width="150" height="150">
-<img src="docs/screenshot16.PNG" width="150" height="150">
-<img src="docs/screenshot17.PNG" width="150" height="150">
-<img src="docs/screenshot18.PNG" width="150" height="150">
-<img src="docs/screenshot19.PNG" width="150" height="150">
-<img src="docs/screenshot20.PNG" width="150" height="150">
-<img src="docs/screenshot21.PNG" width="150" height="150">
-</p>
-
-<p>計測モード画面<p>
 
 ## 主な機能
 
@@ -58,6 +28,17 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 - CX 規格の組み合わせパターン(3 パーツ型 / 4 パーツ型)に対応
 - パーツ画像・メモ(最大 500 文字)を登録できる、自分だけの図鑑機能
 
+## スクリーンショット
+
+<p>↓パーツ管理画面</p>
+<p>
+<img src="docs/screenshot3.PNG" width="150" height="150">
+<img src="docs/screenshot4.PNG" width="150" height="150">
+<img src="docs/screenshot5.PNG" width="150" height="150">
+<img src="docs/screenshot6.PNG" width="150" height="150">
+<img src="docs/screenshot7.PNG" width="150" height="150">
+</p>
+
 ### デッキビルダー
 
 - 「所持パーツから選ぶ」「全パーツから選ぶ」の 2 モードに対応
@@ -66,6 +47,17 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 - 「O 型専用ブレードには通常ラチェット使用不可」など、規格上の互換性ルールを自動チェック
 - ベストコンボパーツの自動表示(サジェスト機能)
 
+## スクリーンショット
+
+<p>↓マイデッキ画面</p>
+<p>
+<img src="docs/screenshot8.PNG" width="150" height="150">
+<img src="docs/screenshot9.PNG" width="150" height="150">
+<img src="docs/screenshot10.PNG" width="150" height="150">
+<img src="docs/screenshot11.PNG" width="150" height="150">
+<img src="docs/screenshot12.PNG" width="150" height="150">
+</p>
+
 ### 対戦記録・分析
 
 - 対戦モード(3 種類)による柔軟な試合記録
@@ -73,15 +65,43 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 - 勝率・対戦成績(勝 / 敗 / 引分)を自動集計
 - バースト回数の記録・表示
 
+## スクリーンショット
+
+<p>↓対戦モード画面</p>
+<p>
+<img src="docs/screenshot13.PNG" width="150" height="150">
+<img src="docs/screenshot14.PNG" width="150" height="150">
+<img src="docs/screenshot15.PNG" width="150" height="150">
+<img src="docs/screenshot16.PNG" width="150" height="150">
+<img src="docs/screenshot17.PNG" width="150" height="150">
+<img src="docs/screenshot18.PNG" width="150" height="150">
+<img src="docs/screenshot19.PNG" width="150" height="150">
+<img src="docs/screenshot20.PNG" width="150" height="150">
+</p>
+
 ### 計測モード
 
 - スピン時間の計測と、最高記録の保存（持久力測定）
   計測した時間はデッキの詳細画面に記録
 
+## スクリーンショット
+
+  <p>↓計測モード画面<p>
+<p>
+<img src="docs/screenshot22.PNG" width="150" height="150">
+<img src="docs/screenshot23.PNG" width="150" height="150">
+<img src="docs/screenshot24.PNG" width="150" height="150">
+<img src="docs/screenshot25.PNG" width="150" height="150">
+</p>
+
 ### プレイヤーカード機能
 
 - 自分のデッキや実績を 1 枚のカードとして可視化
 - QR コードを使用して他人のカードと自身のカードを共有可能、他のユーザーに共有・紹介したくなる機能として設計
+
+## スクリーンショット
+
+<img src="docs/screenshot21.PNG" width="150" height="150">
 
 ## こだわった点
 
