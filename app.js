@@ -1,5 +1,5 @@
 /**
- * データの初期化
+ * データの初期化(起動時にローカルストレージで保存されているデータを読み込む)
  */
 var parts = JSON.parse(localStorage.getItem("bx_parts") || "[]");
 var nextId = parseInt(localStorage.getItem("bx_nextId") || "1");
@@ -8,6 +8,7 @@ var nextDeckId = parseInt(localStorage.getItem("bx_nextDeckId") || "1");
 var renameDeckId = null;
 // ライバルカード一覧
 var rivals = JSON.parse(localStorage.getItem("bx_rivals") || "[]");
+//ローカルストレージにライバルカード情報を保存
 function saveRivals() {
   localStorage.setItem("bx_rivals", JSON.stringify(rivals));
 }
@@ -1236,7 +1237,7 @@ var battleRecords = JSON.parse(
 var measureRecords = JSON.parse(
   localStorage.getItem("bx_measureRecords") || "{}"
 );
-// measureRecords[deckId] = [{time_ms, laps, date}]
+//ローカルストレージに計測した情報を保存
 function saveMeasureRecords() {
   localStorage.setItem("bx_measureRecords", JSON.stringify(measureRecords));
 }
@@ -1246,17 +1247,23 @@ var myRuleSetting = JSON.parse(
 );
 var winCountMode = localStorage.getItem("bx_winCountMode") || "match"; // 'match' or 'battle'
 var myPlayerName = localStorage.getItem("bx_playerName") || "自分";
+
+//ローカルストレージにパーツ情報を保存
 function saveParts() {
   localStorage.setItem("bx_parts", JSON.stringify(parts));
   localStorage.setItem("bx_nextId", nextId);
 }
+//ローカルストレージにデッキ情報を保存
 function saveDecks() {
   localStorage.setItem("bx_decks", JSON.stringify(decks));
   localStorage.setItem("bx_nextDeckId", nextDeckId);
 }
+
+//ローカルストレージにバトル情報を保存
 function saveBattleRecords() {
   localStorage.setItem("bx_battleRecords", JSON.stringify(battleRecords));
 }
+//ローカルストレージにマイルールの情報を保存
 function saveMyRule() {
   localStorage.setItem("bx_myRule", JSON.stringify(myRuleSetting));
 }
@@ -1411,6 +1418,7 @@ function setWinCountMode(m) {
   renderBattleHome();
   renderHome();
 }
+//ローカルストレージにユーザーネーム情報を保存
 function savePlayerName(v) {
   myPlayerName = v.trim() || "自分";
   localStorage.setItem("bx_playerName", myPlayerName);
