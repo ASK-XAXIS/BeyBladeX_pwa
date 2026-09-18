@@ -15,9 +15,29 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 ## スクリーンショット
 
 <p>
-<img src="docs/screenshot1.PNG" width="150">
-<img src="docs/screenshot2.PNG" width="150">
+<img src="docs/screenshot1.PNG" width="150" height="150">
+<img src="docs/screenshot2.PNG" width="150" height="150">
+<img src="docs/screenshot3.PNG" width="150" height="150">
+<img src="docs/screenshot4.PNG" width="150" height="150">
+<img src="docs/screenshot5.PNG" width="150" height="150">
 </p>
+
+<p>
+<img src="docs/screenshot6.PNG" width="150" height="150">
+<img src="docs/screenshot7.PNG" width="150" height="150">
+<img src="docs/screenshot8.PNG" width="150" height="150">
+<img src="docs/screenshot9.PNG" width="150" height="150">
+<img src="docs/screenshot10.PNG" width="150" height="150">
+</p>
+
+<p>
+<img src="docs/screenshot11.PNG" width="150" height="150">
+<img src="docs/screenshot12.PNG" width="150" height="150">
+<img src="docs/screenshot13.PNG" width="150" height="150">
+<img src="docs/screenshot14.PNG" width="150" height="150">
+<img src="docs/screenshot15.PNG" width="150" height="150">
+</p>
+
 ## 主な機能
 
 ### パーツ管理・コレクション機能
