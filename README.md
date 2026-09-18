@@ -14,40 +14,41 @@ BX Manager は、ベイブレード X(BEYBLADE X)のパーツ管理・デッキ�
 
 ## スクリーンショット
 
+<p>メイン画面</p>
 <p>
 <img src="docs/screenshot1.PNG" width="150" height="150">
 <img src="docs/screenshot2.PNG" width="150" height="150">
+</p>
+<p>パーツ管理画面</p>
+<p>
 <img src="docs/screenshot3.PNG" width="150" height="150">
 <img src="docs/screenshot4.PNG" width="150" height="150">
 <img src="docs/screenshot5.PNG" width="150" height="150">
-</p>
-
-<p>
 <img src="docs/screenshot6.PNG" width="150" height="150">
 <img src="docs/screenshot7.PNG" width="150" height="150">
+</p>
+<p>マイデッキ画面</p>
+<p>
 <img src="docs/screenshot8.PNG" width="150" height="150">
 <img src="docs/screenshot9.PNG" width="150" height="150">
 <img src="docs/screenshot10.PNG" width="150" height="150">
-</p>
-
-<p>
 <img src="docs/screenshot11.PNG" width="150" height="150">
 <img src="docs/screenshot12.PNG" width="150" height="150">
+</p>
+<p>対戦モード画面</p>
+<p>
 <img src="docs/screenshot13.PNG" width="150" height="150">
 <img src="docs/screenshot14.PNG" width="150" height="150">
 <img src="docs/screenshot15.PNG" width="150" height="150">
-</p>
-<p>
 <img src="docs/screenshot16.PNG" width="150" height="150">
 <img src="docs/screenshot17.PNG" width="150" height="150">
 <img src="docs/screenshot18.PNG" width="150" height="150">
 <img src="docs/screenshot19.PNG" width="150" height="150">
 <img src="docs/screenshot20.PNG" width="150" height="150">
-</p>
-
-<p>
 <img src="docs/screenshot21.PNG" width="150" height="150">
 </p>
+
+<p>計測モード画面<p>
 
 ## 主な機能
 
