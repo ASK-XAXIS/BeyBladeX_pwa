@@ -3213,6 +3213,7 @@ function saveEditPart() {
   p.img = editThumbData;
   p.memo = document.getElementById("edit-memo-inp").value.trim();
   saveParts();
+  showToast("保存完了！");
   closeModal("modal-edit-part");
   renderParts();
 }
