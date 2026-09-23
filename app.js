@@ -1,505 +1,19 @@
-/**
- * データの初期化(起動時にローカルストレージで保存されているデータを読み込む)
- */
-var parts = JSON.parse(localStorage.getItem("bx_parts") || "[]");
-var nextId = parseInt(localStorage.getItem("bx_nextId") || "1");
-var decks = JSON.parse(localStorage.getItem("bx_decks") || "[]");
-var nextDeckId = parseInt(localStorage.getItem("bx_nextDeckId") || "1");
-var renameDeckId = null;
-// ライバルカード一覧
-var rivals = JSON.parse(localStorage.getItem("bx_rivals") || "[]");
-//ローカルストレージにライバルカード情報を保存
-function saveRivals() {
-  localStorage.setItem("bx_rivals", JSON.stringify(rivals));
-}
-//QRコードの読み取り
-var qrStream = null; // カメラストリーム
-var qrAnimFrame = null; // requestAnimationFrameのID
-// 一時保存用変数（初期化部分に追加）
-var pendingRivalData = null;
 
-// パーツデータベース
-var ALL_DB = [
-  { name: "ドランソード", cat: "blade", line: "bx" },
-  { name: "ヘルズサイズ", cat: "blade", line: "bx" },
-  { name: "ウィザードアロー", cat: "blade", line: "bx" },
-  { name: "ナイトシールド", cat: "blade", line: "bx" },
-  { name: "コバルトドレイク", cat: "blade", line: "bx" },
-  { name: "ナイトランス", cat: "blade", line: "bx" },
-  { name: "シャークエッジ", cat: "blade", line: "bx" },
-  { name: "レオンクロー", cat: "blade", line: "bx" },
-  { name: "ヴァイパーテイル", cat: "blade", line: "bx" },
-  { name: "ライノホーン", cat: "blade", line: "bx" },
-  { name: "ドランダガー", cat: "blade", line: "bx" },
-  { name: "ヘルズチェイン", cat: "blade", line: "bx" },
-  { name: "フェニックスフェザー", cat: "blade", line: "bx" },
-  { name: "フェニックスウイング", cat: "blade", line: "bx" },
-  { name: "ワイバーンゲイル", cat: "blade", line: "bx" },
-  { name: "ユニコーンスティング", cat: "blade", line: "bx" },
-  { name: "スフィンクスカウル", cat: "blade", line: "bx" },
-  { name: "ティラノビート", cat: "blade", line: "bx" },
-  { name: "ヴァイスタイガー", cat: "blade", line: "bx" },
-  { name: "コバルトドラグーン", cat: "blade", line: "bx" },
-  { name: "ブラックシェル", cat: "blade", line: "bx" },
-  { name: "ホエールウェーブ", cat: "blade", line: "bx" },
-  { name: "ベアスクラッチ", cat: "blade", line: "bx" },
-  { name: "クリムゾンガルーダ", cat: "blade", line: "bx" },
-  { name: "プテラスウィング", cat: "blade", line: "bx" },
-  { name: "シノビナイフ", cat: "blade", line: "bx" },
-  { name: "シェルタードレイク", cat: "blade", line: "bx" },
-  { name: "トリケラブレス", cat: "blade", line: "bx" },
-  { name: "サムライカリバー", cat: "blade", line: "bx" },
-  { name: "ティラノロア", cat: "blade", line: "bx" },
-  { name: "ゴートタックル", cat: "blade", line: "bx" },
-  { name: "シャークギル", cat: "blade", line: "bx" },
-  { name: "ドランストライク", cat: "blade", line: "bx" },
-  { name: "ヘブンズリング", cat: "blade", line: "bx" },
-  { name: "ドランザースパイラル", cat: "blade", line: "bx" },
-  { name: "マンモスタスク", cat: "blade", line: "bx" },
-  { name: "クロコクランチ", cat: "blade", line: "bx" },
-  { name: "サムライスチール", cat: "blade", line: "bx" },
-  { name: "ドラグーンストーム", cat: "blade", line: "bx" },
-  { name: "ドライガースラッシュ", cat: "blade", line: "bx" },
-  { name: "ドラシエルシールド", cat: "blade", line: "bx" },
-  { name: "ストームペガシス", cat: "blade", line: "bx" },
-  { name: "(連打)ライトニングエルドラゴ", cat: "blade", line: "bx" },
-  { name: "(アッパー)ライトニングエルドラゴ", cat: "blade", line: "bx" },
-  { name: "ロックレオーネ", cat: "blade", line: "bx" },
-  { name: "ビクトリーヴァルキリー", cat: "blade", line: "bx" },
-  { name: "ゼノエクスカリバー", cat: "blade", line: "bx" },
-  { name: "ストームスプリガン", cat: "blade", line: "bx" },
-  { name: "アイアンマン", cat: "blade", line: "bx" },
-  { name: "サノス", cat: "blade", line: "bx" },
-  { name: "スパイダーマン", cat: "blade", line: "bx" },
-  { name: "ヴェノム", cat: "blade", line: "bx" },
-  { name: "ルーク・スカイウォーカー", cat: "blade", line: "bx" },
-  { name: "ダースベイダー", cat: "blade", line: "bx" },
-  { name: "マンダロリアン", cat: "blade", line: "bx" },
-  { name: "モフ・ギデオン", cat: "blade", line: "bx" },
-  { name: "オプティマスプライム", cat: "blade", line: "bx" },
-  { name: "メガトロン", cat: "blade", line: "bx" },
-  { name: "T-レックス", cat: "blade", line: "bx" },
-  { name: "モササウルス", cat: "blade", line: "bx" },
-  { name: "スピノサウルス", cat: "blade", line: "bx" },
-  { name: "ケツァルコアトルス", cat: "blade", line: "bx" },
-  { name: "トリケラスパイキー", cat: "blade", line: "bx" },
-  { name: "ワイバーンホバー", cat: "blade", line: "ux" },
-  { name: "ドランバスター", cat: "blade", line: "ux" },
-  { name: "ヘルズハンマー", cat: "blade", line: "ux" },
-  { name: "ウィザードロッド", cat: "blade", line: "ux" },
-  { name: "シノビシャドウ", cat: "blade", line: "ux" },
-  { name: "エアロペガサス", cat: "blade", line: "ux" },
-  { name: "レオンクレスト", cat: "blade", line: "ux" },
-  { name: "フェニックスラダー", cat: "blade", line: "ux" },
-  { name: "シルバーウルフ", cat: "blade", line: "ux" },
-  { name: "サムライセイバー", cat: "blade", line: "ux" },
-  { name: "ナイトメイル", cat: "blade", line: "ux" },
-  { name: "インパクトドレイク", cat: "blade", line: "ux" },
-  { name: "ゴーストサークル", cat: "blade", line: "ux" },
-  { name: "オロチクラスター", cat: "blade", line: "ux" },
-  { name: "ゴーレムロック", cat: "blade", line: "ux" },
-  { name: "スコーピオスビア", cat: "blade", line: "ux" },
-  { name: "シャークスケイル", cat: "blade", line: "ux" },
-  { name: "マミーカース", cat: "blade", line: "ux" },
-  { name: "クロックミラージュ", cat: "blade", line: "ux", otype: true },
-  { name: "メテオドラグーン", cat: "blade", line: "ux" },
-  { name: "バレットグリフォン", cat: "blade", line: "ux" },
-  { name: "ドラン", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ウィザード", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ペルセウス", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ヘルズ", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ライノ", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "フォックス", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ペガサス", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ケルベロス", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ホエール", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ソル", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ウルフ", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "フェニックス", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "バハムート", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ナイト", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ラグナ", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ユニコーン", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ワルキューレ", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "エンペラー", cat: "blade", line: "cx", cxType: "lock" },
-  { name: "ブレイブ", cat: "blade", line: "cx", cxType: "main" },
-  { name: "アーク", cat: "blade", line: "cx", cxType: "main" },
-  { name: "ダーク", cat: "blade", line: "cx", cxType: "main" },
-  { name: "リーバー", cat: "blade", line: "cx", cxType: "main" },
-  { name: "ブラッシュ", cat: "blade", line: "cx", cxType: "main" },
-  { name: "ブラスト", cat: "blade", line: "cx", cxType: "main" },
-  { name: "フレイム", cat: "blade", line: "cx", cxType: "main" },
-  { name: "ボルト", cat: "blade", line: "cx", cxType: "main" },
-  { name: "ハント", cat: "blade", line: "cx", cxType: "main" },
-  { name: "マイト", cat: "blade", line: "cx", cxType: "main" },
-  { name: "フレア", cat: "blade", line: "cx", cxType: "main" },
-  { name: "エクリプス", cat: "blade", line: "cx", cxType: "main" },
-  { name: "B（ブレイク）", cat: "blade", line: "cx", cxType: "over" },
-  { name: "G（ガード）", cat: "blade", line: "cx", cxType: "over" },
-  { name: "F（フロー）", cat: "blade", line: "cx", cxType: "over" },
-  { name: "P（ピーク）", cat: "blade", line: "cx", cxType: "over" },
-  { name: "ブリッツ", cat: "blade", line: "cx", cxType: "metal" },
-  { name: "フォートレス", cat: "blade", line: "cx", cxType: "metal" },
-  { name: "レイジ", cat: "blade", line: "cx", cxType: "metal" },
-  { name: "デルタ", cat: "blade", line: "cx", cxType: "metal" },
-  { name: "S（スラッシュ）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "J（ジャギー）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "H（ヘビー）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "K（ナックル）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "O（オッド）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "R（ラウンド）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "B（バンパー）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "C（チャージ）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "A（アサルト）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "E（イレイズ）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "M（マッシブ）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "F（フリー）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "V（ヴァーチカル）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "T（ターン）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "D（デュアル）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "W（ウィール）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "Z（ジリオン）", cat: "blade", line: "cx", cxType: "assist" },
-  { name: "0-60", cat: "ratchet", rtype: "normal" },
-  { name: "0-70", cat: "ratchet", rtype: "normal" },
-  { name: "0-80", cat: "ratchet", rtype: "normal" },
-  { name: "1-50", cat: "ratchet", rtype: "normal" },
-  { name: "1-60", cat: "ratchet", rtype: "normal" },
-  { name: "1-70", cat: "ratchet", rtype: "normal" },
-  { name: "1-80", cat: "ratchet", rtype: "normal" },
-  { name: "2-60", cat: "ratchet", rtype: "normal" },
-  { name: "2-70", cat: "ratchet", rtype: "normal" },
-  { name: "2-80", cat: "ratchet", rtype: "normal" },
-  { name: "3-60", cat: "ratchet", rtype: "normal" },
-  { name: "3-70", cat: "ratchet", rtype: "normal" },
-  { name: "3-80", cat: "ratchet", rtype: "normal" },
-  { name: "4-50", cat: "ratchet", rtype: "normal" },
-  { name: "4-60", cat: "ratchet", rtype: "normal" },
-  { name: "4-70", cat: "ratchet", rtype: "normal" },
-  { name: "4-80", cat: "ratchet", rtype: "normal" },
-  { name: "5-60", cat: "ratchet", rtype: "normal" },
-  { name: "5-70", cat: "ratchet", rtype: "normal" },
-  { name: "5-80", cat: "ratchet", rtype: "normal" },
-  { name: "6-60", cat: "ratchet", rtype: "normal" },
-  { name: "6-70", cat: "ratchet", rtype: "normal" },
-  { name: "6-80", cat: "ratchet", rtype: "normal" },
-  { name: "7-60", cat: "ratchet", rtype: "normal" },
-  { name: "7-70", cat: "ratchet", rtype: "normal" },
-  { name: "7-80", cat: "ratchet", rtype: "normal" },
-  { name: "8-70", cat: "ratchet", rtype: "normal" },
-  { name: "9-60", cat: "ratchet", rtype: "normal" },
-  { name: "9-70", cat: "ratchet", rtype: "normal" },
-  { name: "9-80", cat: "ratchet", rtype: "normal" },
-  { name: "4-55", cat: "ratchet", rtype: "otype" },
-  { name: "7-55", cat: "ratchet", rtype: "otype" },
-  { name: "9-65", cat: "ratchet", rtype: "otype" },
-  { name: "3-85", cat: "ratchet", rtype: "otype" },
-  { name: "M-85", cat: "ratchet", rtype: "otype" },
-  { name: "F（フラット）", cat: "bit" },
-  { name: "LF（ロウフラット）", cat: "bit" },
-  { name: "R（ラッシュ）", cat: "bit" },
-  { name: "GF（ギヤフラット）", cat: "bit" },
-  { name: "A（アクセル）", cat: "bit" },
-  { name: "Q（クエイク）", cat: "bit" },
-  { name: "C（サイクロン）", cat: "bit" },
-  { name: "L（レベル）", cat: "bit" },
-  { name: "RA（ラバーアクセル）", cat: "bit" },
-  { name: "LR（ロウラッシュ）", cat: "bit" },
-  { name: "V（ボルテックス）", cat: "bit" },
-  { name: "GR（ギアラッシュ）", cat: "bit" },
-  { name: "UF（アンダーフラッ）", cat: "bit" },
-  { name: "J（ジョルト）", cat: "bit" },
-  { name: "I（イグニッション）", cat: "bit" },
-  { name: "T（テーパー）", cat: "bit" },
-  { name: "P（ポイント）", cat: "bit" },
-  { name: "HT（ハイテーパー）", cat: "bit" },
-  { name: "GP（ギヤポイント）", cat: "bit" },
-  { name: "H（ヘキサ）", cat: "bit" },
-  { name: "U（ユナイト）", cat: "bit" },
-  { name: "E（エレベート）", cat: "bit" },
-  { name: "TP（トランスポイント）", cat: "bit" },
-  { name: "K（キック）", cat: "bit" },
-  { name: "Z（ザップ）", cat: "bit" },
-  { name: "M（マージ）", cat: "bit" },
-  { name: "TK（トランスキック）", cat: "bit" },
-  { name: "GU（ギヤユナイト）", cat: "bit" },
-  { name: "B（ボール）", cat: "bit" },
-  { name: "O（オーブ）", cat: "bit" },
-  { name: "GB（ギヤボール）", cat: "bit" },
-  { name: "DB（ディスクボール）", cat: "bit" },
-  { name: "G（グライド）", cat: "bit" },
-  { name: "FB（フリーボール）", cat: "bit" },
-  { name: "LO（ローオーブ）", cat: "bit" },
-  { name: "WB（ウォールボール）", cat: "bit" },
-  { name: "Y（イールディング）", cat: "bit" },
-  { name: "N（ニードル）", cat: "bit" },
-  { name: "HN（ハイニードル）", cat: "bit" },
-  { name: "S（スパイク）", cat: "bit" },
-  { name: "GN（ギヤニードル）", cat: "bit" },
-  { name: "MN（メタルニードル）", cat: "bit" },
-  { name: "D（ドット）", cat: "bit" },
-  { name: "BS（バウンドスパイク）", cat: "bit" },
-  { name: "UN（アンダーニードル）", cat: "bit" },
-  { name: "W（ウェッジ）", cat: "bit" },
-  { name: "WW（ウォールウェッジ）", cat: "bit" },
-  { name: "Tr（ターボ）", cat: "combo", combotype: "Tr" },
-  { name: "Op（オペレート）", cat: "combo", combotype: "Op" },
-];
-
-/*各種定数*/
-/*定数名={key:値}*/
-var LINE = { bx: "BX", ux: "UX", cx: "CX" };
-var CXLBL = {
-  lock: "ロックチップ",
-  main: "メインブレード",
-  assist: "アシストブレード",
-  metal: "メタルブレード",
-  over: "オーバーブレード",
-};
-var CATLBL = {
-  blade: "ブレード",
-  ratchet: "ラチェット",
-  bit: "ビット",
-  combo: "一体型ビット",
-};
-var EMOJI = { blade: "⚔️", ratchet: "🔩", bit: "🔵", combo: "💠" };
-var RTLBL = { normal: "通常", otype: "O型" };
-
-/**
- * グローバル変数
- */
-var mainTab = "all",
-  bladeSubTab = "all",
-  cxSubTab = "lock";
-var thumbTarget = null,
-  thumbMap = {},
-  cxAddPat = 3;
-var rowCount = { bxux: 1, ratchet: 1, bit: 1, combo: 1 };
-var deckMode = "owned",
-  deckBladeLine = "bx",
-  deckCxPat = 3;
-var DS = {
-  bladeLine: null,
-  blade: null,
-  lock: null,
-  main: null,
-  assist: null,
-  metal: null,
-  over: null,
-  lock4: null,
-  assist4: null,
-  ratchet: null,
-  bit: null,
-  combo: null,
-};
-var userEditedName = false;
 
 /**
  * ユーティリティ関数
  */
 
-/**
- *dsInit()
- デッキセット初期化関数
- デッキセットにフィールドが増えた場合はココにも追加
- */
-function dsInit() {
-  DS = {
-    bladeLine: null,
-    cxPat: 3,
-    blade: null,
-    lock: null,
-    main: null,
-    assist: null,
-    lock4: null,
-    metal: null,
-    over: null,
-    assist4: null,
-    ratchet: null,
-    bit: null,
-    combo: null,
-  };
-}
 
-/**
- * showToast(msg, type)
- * 画面下部にトースト表示をする関数
- * @param {*} msg 表示するメッセージ文字列
- * @param {*} type 表示スタイル（省略可）
- * typeの種類：
 
-type	見た目	使用場面
-'ok'	緑系	成功時（「登録しました」など）
-'warn'	黄色系	警告時
-省略	デフォルト色	エラーや通常メッセージ
- */
-function showToast(msg, type) {
-  var t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast " + (type || "");
-  t.classList.add("show");
-  setTimeout(function () {
-    t.classList.remove("show");
-  }, 2800);
-}
 
-/**
- * closeModal(id)
- * モーダルの非表示化（閉じるボタンや、戻るを押すときに必ず呼ぶ）
- * @param {*} id 閉じたいモーダルのID
- */
-function closeModal(id) {
-  document.getElementById(id).classList.add("hidden");
-}
 
-//画面切り替え時の一時保留用変数
-var pendingNavTarget = null;
 
-/**
- * 戻るボタンやキャンセルボタンを押したときに入力や選択がある状態なら
- * 確認ダイアログを出す
- */
-function checkNavReturn() {
-  var hasInput = false;
 
-  // 選択中のパーツ表示を確認
-  var selectedItemsText = document.getElementById(
-    "add-picker-selected-names"
-  ).textContent;
 
-  if (selectedItemsText.trim()) {
-    hasInput = true;
-  }
 
-  if (hasInput) {
-    // 確認ダイアログを表示して止まる
-    pendingNavTarget = "modal-add-picker"; // 閉じるモーダルIDを保存
-    document.getElementById("modal-confirm-nav").classList.remove("hidden");
-  } else {
-    // 入力なし → そのまま閉じる
-    closeModal("modal-add-picker");
-  }
-}
-/**
- * checkNavSwitch(name)
- * タブを切り替える前にユーザーに確認する関数
- * @param {*} name 押したタブの名前
- */
-function checkNavSwitch(name) {
-  //入力中のデータの有無
-  var hasInput = false;
 
-  //パーツ追加モーダルのチェック
-  var addPickerModal = document.getElementById("modal-add-picker");
-  if (addPickerModal && !addPickerModal.classList.contains("hidden")) {
-    //モーダル内で何かが選択されているかのチェック
-    var hasChecked = false;
-    Object.keys(addPickerTemp).forEach(function (k) {
-      if (Object.keys(addPickerTemp[k]).length > 0) hasChecked = true;
-    });
-    if (hasChecked) hasInput = true;
-  }
 
-  // デッキ作成モーダルのチェック
-  var deckModal = document.getElementById("modal-deck");
-  if (deckModal && !deckModal.classList.contains("hidden")) {
-    var allNames = [
-      DS.blade,
-      DS.lock,
-      DS.main,
-      DS.assist,
-      DS.lock4,
-      DS.metal,
-      DS.over,
-      DS.assist4,
-      DS.ratchet,
-      DS.bit,
-      DS.combo,
-    ].filter(Boolean); //.filter(Boolean)はnull・undifinedを除外する
-    if (allNames.length > 0) hasInput = true;
-
-    //デッキ名入力欄に文字が入っているかを確認
-    var nameInp = document.getElementById("deck-name-inp");
-    if (nameInp && nameInp.value.trim()) hasInput = true;
-  }
-
-  var pickerModal = document.getElementById("modal-picker");
-  if (pickerModal && !pickerModal.classList.contains("hidden")) {
-    var hasP = Object.keys(pickerTemp).some(function (k) {
-      return !!pickerTemp[k];
-    });
-    if (hasP) hasInput = true;
-  }
-
-  /**
-   * チェック結果による分岐
-   * hasInput = true→確認ダイアログを表示し、ユーザーに選択してもらう
-   *          = false→全モーダルを閉じ選択したタブの画面に遷移
-   */
-  if (hasInput) {
-    pendingNavTarget = name;
-    document.getElementById("modal-confirm-nav").classList.remove("hidden");
-  } else {
-    [
-      "modal-part",
-      "modal-add-picker",
-      "modal-deck",
-      "modal-picker",
-      "modal-rename",
-      "modal-battle-deck",
-    ].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.add("hidden");
-    });
-    showScreen(name);
-  }
-}
-
-/**
- * 確認ダイアログでYES（はい）を選択したときの関数
- */
-function confirmNavYes() {
-  closeModal("modal-confirm-nav");
-  // pendingNavTargetがモーダルIDの場合はcloseModal
-  if (pendingNavTarget && pendingNavTarget.startsWith("modal-")) {
-    closeModal(pendingNavTarget);
-  } else {
-    // 従来通り画面遷移
-    showScreen(pendingNavTarget);
-  }
-  pendingNavTarget = null;
-}
-
-/**
- * Cancel navigation modal
- */
-function confirmNavNo() {
-  document.getElementById("modal-confirm-nav").classList.add("hidden");
-  pendingNavTarget = null;
-}
-
-//画面切替え用関数
-function showScreen(name) {
-  //全画面のactiveを外す
-  document.querySelectorAll(".screen").forEach(function (s) {
-    s.classList.remove("active");
-  });
-
-  //全ナビゲーションボタンのactiveを外す
-  document.querySelectorAll(".nav-btn").forEach(function (b) {
-    b.classList.remove("active");
-  });
-
-  //指定した画面だけactiveをつける
-  document.getElementById("screen-" + name).classList.add("active");
-  document.getElementById("nav-" + name).classList.add("active");
-
-  //画面ごとの描画関数を呼ぶ(画面下部のタブを押すとそれぞれが呼ばれる)
-  if (name === "home") renderHome();
-  if (name === "parts") renderParts();
-  if (name === "decks") renderDecks();
-  if (name === "battle") renderBattleHome();
-  if (name === "timer") renderTimerHome();
-}
 
 // 勝敗記録（将来の拡張用）
 
@@ -515,25 +29,8 @@ var timerLaps = [];
 var timerSelectMode = "saved"; // saved, owned, all
 var timerDeckViewMode = "recent"; // 'recent','best','avg'
 
-function fmtTime(ms) {
-  var m = Math.floor(ms / 60000);
-  var s = Math.floor((ms % 60000) / 1000);
-  var cs = Math.floor((ms % 1000) / 10);
-  return (
-    (m > 0 ? m + ":" : "") +
-    (m > 0 ? String(s).padStart(2, "0") : s) +
-    "." +
-    String(cs).padStart(2, "0")
-  );
-}
-function fmtTimeSec(ms) {
-  // 持久力表示用：秒単位（小数点以下2桁）
-  return (ms / 1000).toFixed(2);
-}
-function fmtTimeDuration(ms) {
-  // 持久力 XX.XX 秒 の形式で返す
-  return "持久力 " + fmtTimeSec(ms) + " 秒";
-}
+
+
 
 /**
  * 計測モードホーム画面
@@ -1217,56 +714,12 @@ function clearMeasRecords(deckId) {
   renderHome();
 }
 
-// ===== テーマ管理 =====
-var themeMode = localStorage.getItem("bx_theme") || "system"; // 'system','dark','light'
-function applyTheme() {
-  var root = document.documentElement;
-  if (themeMode === "light") {
-    root.setAttribute("data-theme", "light");
-  } else if (themeMode === "dark") {
-    root.setAttribute("data-theme", "dark");
-  } else {
-    root.removeAttribute("data-theme");
-  }
-}
-applyTheme();
 
-var battleRecords = JSON.parse(
-  localStorage.getItem("bx_battleRecords") || "[]"
-);
-var measureRecords = JSON.parse(
-  localStorage.getItem("bx_measureRecords") || "{}"
-);
-//ローカルストレージに計測した情報を保存
-function saveMeasureRecords() {
-  localStorage.setItem("bx_measureRecords", JSON.stringify(measureRecords));
-}
-var myRuleSetting = JSON.parse(
-  localStorage.getItem("bx_myRule") ||
-    JSON.stringify({ winPt: 4, deckCount: 1, noDupe: true })
-);
-var winCountMode = localStorage.getItem("bx_winCountMode") || "match"; // 'match' or 'battle'
-var myPlayerName = localStorage.getItem("bx_playerName") || "自分";
 
-//ローカルストレージにパーツ情報を保存
-function saveParts() {
-  localStorage.setItem("bx_parts", JSON.stringify(parts));
-  localStorage.setItem("bx_nextId", nextId);
-}
-//ローカルストレージにデッキ情報を保存
-function saveDecks() {
-  localStorage.setItem("bx_decks", JSON.stringify(decks));
-  localStorage.setItem("bx_nextDeckId", nextDeckId);
-}
 
-//ローカルストレージにバトル情報を保存
-function saveBattleRecords() {
-  localStorage.setItem("bx_battleRecords", JSON.stringify(battleRecords));
-}
-//ローカルストレージにマイルールの情報を保存
-function saveMyRule() {
-  localStorage.setItem("bx_myRule", JSON.stringify(myRuleSetting));
-}
+
+
+
 
 // ============================================================
 // 対戦モード
@@ -1383,46 +836,11 @@ function renderBattleHome() {
   document.getElementById("battle-content").innerHTML = html;
 }
 
-function getThemeChipsHtml() {
-  var chips = [
-    ["system", "自動"],
-    ["dark", "🌙 ダーク"],
-    ["light", "☀️ ライト"],
-  ];
-  var html = '<div style="display:flex;gap:5px;">';
-  chips.forEach(function (c) {
-    var active = themeMode === c[0] ? "active" : "";
-    html +=
-      '<span class="sel-chip ' +
-      active +
-      '" data-t="' +
-      c[0] +
-      '" onclick="setTheme(this.dataset.t)" style="font-size:10px;padding:4px 8px;cursor:pointer;">' +
-      c[1] +
-      "</span>";
-  });
-  html += "</div>";
-  return html;
-}
 
-function setTheme(t) {
-  themeMode = t;
-  localStorage.setItem("bx_theme", t);
-  applyTheme();
-  renderBattleHome();
-}
 
-function setWinCountMode(m) {
-  winCountMode = m;
-  localStorage.setItem("bx_winCountMode", m);
-  renderBattleHome();
-  renderHome();
-}
-//ローカルストレージにユーザーネーム情報を保存
-function savePlayerName(v) {
-  myPlayerName = v.trim() || "自分";
-  localStorage.setItem("bx_playerName", myPlayerName);
-}
+
+
+
 
 // ============================================================
 // バトルセットアップ
@@ -2321,190 +1739,7 @@ function discardTempDeck(side, idx) {
   renderBattleResult();
 }
 
-function renderHome() {
-  // 所持パーツ数（qty>0）
-  var ownedCount = parts.filter(function (p) {
-    return p.qty > 0;
-  }).length;
-  document.getElementById("home-parts-count").textContent = ownedCount;
-  document.getElementById("home-decks-count").textContent = decks.length;
 
-  // 勝敗集計（winCountModeに対応）
-  var src =
-    winCountMode === "battle"
-      ? battleRecords.reduce(function (a, r) {
-          return a.concat(r.battles || []);
-        }, [])
-      : battleRecords;
-  var wins = src.filter(function (r) {
-    return r.result === "win";
-  }).length;
-  var losses = src.filter(function (r) {
-    return r.result === "loss";
-  }).length;
-  var draws = src.filter(function (r) {
-    return r.result === "draw";
-  }).length;
-  var total = wins + losses + draws;
-  document.getElementById("home-wins").textContent = wins;
-  document.getElementById("home-losses").textContent = losses;
-  document.getElementById("home-draws").textContent = draws;
-  var rateEl = document.getElementById("home-win-rate");
-  if (total > 0) {
-    rateEl.textContent = Math.round((wins / total) * 100) + "%";
-  } else {
-    rateEl.textContent = "—";
-  }
-
-  // 最近追加パーツ（最大5件）
-  var recentParts = [].concat(parts).reverse().slice(0, 5);
-  var rpEl = document.getElementById("home-recent-parts");
-  if (rpEl) {
-    if (!recentParts.length) {
-      rpEl.innerHTML =
-        '<div style="font-size:11px;color:var(--text3);">パーツ未登録</div>';
-    } else {
-      rpEl.innerHTML = recentParts
-        .map(function (p) {
-          var th = p.img ? '<img src="' + p.img + '">' : EMOJI[p.cat] || "❓";
-          return (
-            '<div class="home-recent-part">' +
-            '<div class="home-recent-part-thumb">' +
-            th +
-            "</div>" +
-            '<div class="home-recent-part-name">' +
-            p.name +
-            "</div>" +
-            "</div>"
-          );
-        })
-        .join("");
-    }
-  }
-
-  // 最近追加デッキ（最大3件）
-  var recentDecks = [].concat(decks).reverse().slice(0, 3);
-  var rdEl = document.getElementById("home-recent-decks");
-  if (rdEl) {
-    if (!recentDecks.length) {
-      rdEl.innerHTML =
-        '<div style="font-size:11px;color:var(--text3);">デッキ未登録</div>';
-    } else {
-      rdEl.innerHTML = recentDecks
-        .map(function (d) {
-          return (
-            '<div class="home-recent-deck">' +
-            '<div class="home-recent-deck-name">' +
-            d.name +
-            "</div>" +
-            '<div class="home-recent-deck-parts">' +
-            getAllNames(d).join(" / ") +
-            "</div>" +
-            "</div>"
-          );
-        })
-        .join("");
-    }
-  }
-
-  // 計測最高記録
-  var bestTimeEl = document.getElementById("home-best-time");
-  if (bestTimeEl) {
-    var bestTime = 0,
-      bestDeckName = "",
-      bestDate = "";
-    Object.keys(measureRecords).forEach(function (deckId) {
-      var recs = measureRecords[deckId] || [];
-      recs.forEach(function (r) {
-        if (r.time_ms > bestTime) {
-          bestTime = r.time_ms;
-          bestDate = r.date;
-          var d = decks.find(function (x) {
-            return x.id === parseInt(deckId);
-          });
-          bestDeckName = d ? d.name : "不明なデッキ";
-        }
-      });
-    });
-    if (bestTime > 0) {
-      bestTimeEl.innerHTML =
-        '<div class="home-deck-card" style="border-color:var(--accent);">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
-        "<div>" +
-        '<div style="font-size:10px;color:var(--text2);margin-bottom:2px;">🏆 ベストタイム</div>' +
-        '<div style="font-size:10px;color:var(--text2);margin-bottom:2px;">持久力</div>' +
-        '<div style="font-size:24px;font-weight:700;color:var(--accent);">' +
-        fmtTimeSec(bestTime) +
-        " 秒</div>" +
-        '<div style="font-size:11px;color:var(--text2);margin-top:2px;">' +
-        bestDeckName +
-        "</div>" +
-        "</div>" +
-        '<div style="font-size:10px;color:var(--text3);">' +
-        new Date(bestDate).toLocaleDateString("ja-JP") +
-        "</div>" +
-        "</div>" +
-        "</div>";
-    } else {
-      bestTimeEl.innerHTML =
-        '<div style="font-size:11px;color:var(--text3);">計測記録なし</div>';
-    }
-  }
-
-  // 試合用デッキ
-  var battleDecks = decks.filter(function (d) {
-    return d.battle;
-  });
-  var el = document.getElementById("home-battle-decks");
-  if (!battleDecks.length) {
-    el.innerHTML =
-      '<div class="home-empty">試合用デッキが登録されていません<br>マイデッキから「試合用に登録」してください</div>';
-    return;
-  }
-  el.innerHTML = battleDecks
-    .map(function (d, idx) {
-      var parts_list = [];
-      if (d.blade) parts_list.push({ label: "ブレード", name: d.blade });
-      if (d.lock) parts_list.push({ label: "ロック", name: d.lock });
-      if (d.main) parts_list.push({ label: "メイン", name: d.main });
-      if (d.assist) parts_list.push({ label: "アシスト", name: d.assist });
-      if (d.lock4) parts_list.push({ label: "ロック", name: d.lock4 });
-      if (d.metal) parts_list.push({ label: "メタル", name: d.metal });
-      if (d.over) parts_list.push({ label: "オーバー", name: d.over });
-      if (d.assist4) parts_list.push({ label: "アシスト", name: d.assist4 });
-      if (d.combo) parts_list.push({ label: "一体型", name: d.combo });
-      else {
-        if (d.ratchet)
-          parts_list.push({ label: "ラチェット", name: d.ratchet });
-        if (d.bit) parts_list.push({ label: "ビット", name: d.bit });
-      }
-      var slots = parts_list
-        .map(function (p) {
-          return (
-            '<span class="home-deck-part"><span style="color:var(--color-text-tertiary,var(--text3));font-size:9px;">' +
-            p.label +
-            "</span> " +
-            p.name +
-            "</span>"
-          );
-        })
-        .join("");
-      return (
-        '<div class="home-deck-card">' +
-        '<div class="home-deck-name">' +
-        '<span style="font-size:11px;background:rgba(76,175,130,0.2);color:#4caf82;padding:2px 8px;border-radius:10px;">DECK ' +
-        (idx + 1) +
-        "</span>" +
-        d.name +
-        "</div>" +
-        '<div class="home-deck-slot">' +
-        slots +
-        "</div>" +
-        "</div>"
-      );
-    })
-    .join("");
-}
 
 function renderStats() {
   var c = { blade: 0, ratchet: 0, bit: 0, combo: 0 };
@@ -2587,14 +1822,7 @@ function renderSubTabs() {
 }
 var partsSearchQuery = "";
 
-function normalizeStr(s) {
-  // ひらがな→カタカナ変換して比較
-  return s
-    .replace(/[ぁ-ゖ]/g, function (c) {
-      return String.fromCharCode(c.charCodeAt(0) + 0x60);
-    })
-    .toLowerCase();
-}
+
 
 function getFiltered() {
   var q = normalizeStr(partsSearchQuery.trim());
@@ -3943,21 +3171,7 @@ function checkUnowned(d) {
   });
 }
 
-function getAllNames(d) {
-  return [
-    d.blade,
-    d.lock,
-    d.main,
-    d.assist,
-    d.lock4,
-    d.metal,
-    d.over,
-    d.assist4,
-    d.ratchet,
-    d.bit,
-    d.combo,
-  ].filter(Boolean);
-}
+
 
 function toggleBattle(id) {
   var d = decks.find(function (x) {
@@ -4175,21 +3389,7 @@ function checkDeckWarn() {
   document.getElementById("otype-warn").style.display = bad ? "flex" : "none";
 }
 
-function getAllDSNames() {
-  return [
-    DS.blade,
-    DS.lock,
-    DS.main,
-    DS.assist,
-    DS.lock4,
-    DS.metal,
-    DS.over,
-    DS.assist4,
-    DS.ratchet,
-    DS.bit,
-    DS.combo,
-  ].filter(Boolean);
-}
+
 
 function updateAutoName() {
   if (userEditedName) return;
@@ -4783,11 +3983,7 @@ function saveDeck() {
 renderHome();
 showScreen("home");
 
-// ページ離脱時の保険として保存
-window.addEventListener("beforeunload", function () {
-  saveParts();
-  saveDecks();
-});
+
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
