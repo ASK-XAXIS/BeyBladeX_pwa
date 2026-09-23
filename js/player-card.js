@@ -88,9 +88,6 @@ function renderMyPlayerCard() {
       };
     }),
   });
-  console.log("内容:", qrData);
-  console.log("文字数:", qrData.length);
-  console.log("バイト数:", encodeURIComponent(qrData).length);
 
   var html = '<div style="padding:0 0 80px;">';
 
