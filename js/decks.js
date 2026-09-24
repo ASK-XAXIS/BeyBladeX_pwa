@@ -13,14 +13,14 @@ var pickerTarget = null; // 'blade','ratchet','bit','combo'
 var pickerBladeLine = "bx";
 var pickerCxPat = 3;
 
-var pickerTemp = {}; // temp selections inside picker
+var pickerTemp = {};
 var pickerSearchQuery = "";
-
 
 //==============================================================
 //関数
 //==============================================================
 
+/* マイデッキ一覧描画 */
 function renderDecks() {
   var list = document.getElementById("deck-list");
   if (!decks.length) {
@@ -84,6 +84,7 @@ function renderDecks() {
     .join("");
 }
 
+/*　デッキパーツ表示　*/
 function renderDeckParts(d) {
   var rows = [];
   if (d.blade) rows.push(mkDRow(d.blade, "blade", "ブレード"));
@@ -103,6 +104,7 @@ function renderDeckParts(d) {
   return rows.join("");
 }
 
+/*デッキ行HTML生成*/
 function mkDRow(name, cat, label) {
   var p = parts.find(function (x) {
     return x.name === name && x.cat === cat;
@@ -123,6 +125,7 @@ function mkDRow(name, cat, label) {
   );
 }
 
+/*未所持パーツチェック*/
 function checkUnowned(d) {
   var names = [
     d.blade,
@@ -145,8 +148,7 @@ function checkUnowned(d) {
   });
 }
 
-
-
+/* 登録されている試合用デッキの登録解除 */
 function toggleBattle(id) {
   var d = decks.find(function (x) {
     return x.id === id;
@@ -156,7 +158,7 @@ function toggleBattle(id) {
   renderDecks();
   renderHome();
 }
-
+/*　試合用登録　*/
 function tryAddBattle(id) {
   var d = decks.find(function (x) {
     return x.id === id;
@@ -185,6 +187,7 @@ function tryAddBattle(id) {
   renderHome();
 }
 
+/*デッキ削除*/
 function delDeck(id) {
   decks = decks.filter(function (x) {
     return x.id !== id;
@@ -194,6 +197,7 @@ function delDeck(id) {
   renderHome();
 }
 
+/*　名前変更モーダル　*/
 function openRename(id) {
   renameDeckId = id;
   var d = decks.find(function (x) {
@@ -204,6 +208,7 @@ function openRename(id) {
   document.getElementById("modal-rename").classList.remove("hidden");
 }
 
+/*名前変更保存*/
 function saveRename() {
   var name = document.getElementById("rename-inp").value.trim();
   if (!name) {
@@ -218,6 +223,7 @@ function saveRename() {
   saveDecks();
   renderDecks();
 }
+
 /**
  * デッキの新規作成時に呼ばれる関数
  * マイデッキモードの（+新規）ボタンを押したとき
@@ -238,6 +244,7 @@ function openAddDeck() {
   document.getElementById("modal-deck").classList.remove("hidden");
 }
 
+/*デッキ選択モード切替*/
 function setDeckMode(m) {
   deckMode = m;
   pickerMode = m;
@@ -281,6 +288,7 @@ function updateDeckDisplay() {
   updateAutoName();
 }
 
+/*選択表示更新*/
 function setSelDisplay(key, value) {
   var el = document.getElementById(key + "-sel-text");
   if (!el) return;
@@ -308,6 +316,7 @@ function setSelDisplay(key, value) {
   }
 }
 
+/*デッキ警告チェック*/
 function checkDeckWarn() {
   var allNames = getAllDSNames();
   var hasUnowned = allNames.some(function (n) {
@@ -335,8 +344,7 @@ function checkDeckWarn() {
   document.getElementById("otype-warn").style.display = bad ? "flex" : "none";
 }
 
-
-
+/*自動名前生成*/
 function updateAutoName() {
   if (userEditedName) return;
   var bp = "";
@@ -369,12 +377,16 @@ function updateAutoName() {
 // ============================================================
 // PICKER
 // ============================================================
+
+/*ピッカー検索*/
 function onPickerSearch(val) {
   pickerSearchQuery = val;
   var wrap = document.getElementById("picker-search-wrap");
   if (wrap) wrap.classList.toggle("has-query", !!val);
   updatePickerList();
 }
+
+/*ピッカーリスト更新*/
 function updatePickerList() {
   var listHtml = "";
   if (pickerTarget === "blade") {
@@ -465,6 +477,8 @@ function updatePickerList() {
   if (container) container.innerHTML = listHtml;
   updatePickerDoneBtn();
 }
+
+/*ピッカー検索クリア*/
 function clearPickerSearch() {
   pickerSearchQuery = "";
   var inp = document.getElementById("picker-search-inp");
@@ -474,6 +488,7 @@ function clearPickerSearch() {
   renderPickerMain();
 }
 
+/*パーツ選択ピッカー*/
 function openPartPicker(target) {
   pickerTarget = target;
   pickerTemp = {};
@@ -529,6 +544,7 @@ function openPartPicker(target) {
   document.getElementById("modal-picker").classList.remove("hidden");
 }
 
+/*　ブレードラインチップ　*/
 function renderPickerBladeLineChips() {
   ["bx", "ux", "cx"].forEach(function (l) {
     var el = document.getElementById("pbl-" + l);
@@ -536,6 +552,7 @@ function renderPickerBladeLineChips() {
   });
 }
 
+/*ブレードライン切替*/
 function setPickerBladeLine(l) {
   pickerBladeLine = l;
   pickerTemp = {};
@@ -547,6 +564,7 @@ function setPickerBladeLine(l) {
   renderPickerMain();
 }
 
+/*CXパターン切替*/
 function setPickerCxPat(n) {
   pickerCxPat = n;
   pickerTemp = {};
@@ -556,6 +574,7 @@ function setPickerCxPat(n) {
   renderPickerMain();
 }
 
+/*ピッカーパーツ取得*/
 function getPickerParts(cat, line, cxType) {
   var useAll = pickerMode !== "owned";
   var q = normalizeStr(pickerSearchQuery.trim());
@@ -587,6 +606,7 @@ function getPickerParts(cat, line, cxType) {
   return owned.concat(extra);
 }
 
+/*ラジオリストHTML*/
 function makeRadioList(items, selKey, currentVal, isOtypeFilter) {
   if (!items.length)
     return '<div style="font-size:11px;color:var(--text3);padding:8px;">パーツなし</div>';
@@ -629,6 +649,7 @@ function makeRadioList(items, selKey, currentVal, isOtypeFilter) {
   return html;
 }
 
+/*ラジオクリック処理*/
 function handleRadioClick(el) {
   var key = el.getAttribute("data-key");
   var name = el
@@ -638,8 +659,7 @@ function handleRadioClick(el) {
   selectRadio(key, name);
 }
 
-
-
+/*	ピッカーメイン描画　*/
 function renderPickerMain() {
   var area = document.getElementById("picker-main-area");
   var searchHtml =
@@ -752,6 +772,7 @@ function renderPickerMain() {
   updatePickerDoneBtn();
 }
 
+/*ラジオ選択*/
 function selectRadio(key, name) {
   // Toggle: if already selected, deselect
   if (pickerTemp[key] === name) {
@@ -763,6 +784,7 @@ function selectRadio(key, name) {
   renderPickerMain();
 }
 
+/*完了ボタン更新*/
 function updatePickerDoneBtn() {
   var btn = document.getElementById("picker-done-btn");
   var incomplete = document.getElementById("picker-incomplete-msg");
@@ -794,6 +816,7 @@ function updatePickerDoneBtn() {
   if (btn) btn.disabled = !ok;
 }
 
+/*ピッカー確定*/
 function pickerDone() {
   if (pickerTarget === "blade") {
     DS.bladeLine = pickerBladeLine;
@@ -843,6 +866,7 @@ function pickerDone() {
   updateDeckDisplay();
 }
 
+/*デッキ保存*/
 function saveDeck() {
   var isCX = DS.bladeLine === "cx";
   if (!DS.bladeLine) {
@@ -926,31 +950,7 @@ function saveDeck() {
   renderDecks();
 }
 
-renderHome();
-showScreen("home");
-
-
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker
-      .register("sw.js")
-      .then(function (reg) {
-        console.log("SW registered:", reg.scope);
-      })
-      .catch(function (err) {
-        console.log("SW registration failed:", err);
-      });
-  });
-}
-if (window.navigator.standalone) {
-  document.body.style.paddingTop = "env(safe-area-inset-top)";
-}
-
-/*プレイヤーカード関連*/
-
-
-
+/*デッキ名解析*/
 function parseDeckName(str) {
   var result = {
     blade: null,
@@ -1016,6 +1016,7 @@ function parseDeckName(str) {
   return result;
 }
 
+/*デッキ名入力処理*/
 function onDeckNameInput(val) {
   userEditedName = true;
 
@@ -1052,7 +1053,8 @@ function onDeckNameInput(val) {
 
   updateDeckDisplay();
 }
-// 新規デッキ組み立てモーダル（既存のデッキビルダーを流用）
+
+/* 新規デッキ組み立てモーダル（既存のデッキビルダーを流用）*/
 function openNewDeckBuilder(side, idx) {
   setupEditTarget = { side: side, idx: idx };
   // 既存のopenAddDeckを呼び出してモーダルを開く
@@ -1081,6 +1083,7 @@ function openNewDeckBuilder(side, idx) {
   document.getElementById("modal-deck").classList.remove("hidden");
 }
 
+/*一時デッキ保存*/
 function saveTempDeck() {
   var isCX = DS.bladeLine === "cx";
   if (!DS.bladeLine) {
@@ -1169,6 +1172,8 @@ function saveTempDeck() {
 // ============================================================
 // デッキ重複チェック共通関数
 // ============================================================
+
+/*デッキ重複チェック*/
 function checkDeckDupe(deckArr, skipIdx, newNames) {
   if (!BS.ruleNoDupe) return null;
   for (var i = 0; i < deckArr.length; i++) {
@@ -1183,6 +1188,7 @@ function checkDeckDupe(deckArr, skipIdx, newNames) {
   return null;
 }
 
+/*全デッキ重複チェック*/
 function checkAllDecksDupe(deckArr, label) {
   for (var i = 0; i < deckArr.length; i++) {
     if (!deckArr[i].parts) continue;
