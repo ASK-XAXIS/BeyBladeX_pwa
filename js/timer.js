@@ -1,6 +1,6 @@
 /**
  * timer.js
- * タイマー関連の変数・関数
+ * 計測モード関連の変数・関数
  */
 
 // ============================================================
@@ -19,10 +19,9 @@ var timerDeckViewMode = "recent"; // 'recent','best','avg'
 var countdownSteps = ["3", "2", "1", "ゴーシュート！"];
 var countdownInterval = null;
 
-
 //============================================================
 // 関数
-//============================================================  
+//============================================================
 
 /* 計測モードホーム画面描画*/
 function renderTimerHome() {
@@ -425,14 +424,21 @@ function resetTimer() {
 /*結果画面描画*/
 function renderTimerResult() {
   var total = fmtTimeSec(timerElapsed); // 秒単位
+  var minutesAndSeconds = fmtTimeMinAndSec(total);
   var html =
     '<div style="padding:0 0 80px;">' +
     '<div class="timer-result-card">' +
     '<div style="font-size:12px;color:var(--text2);margin-bottom:8px;">計測結果</div>' +
     '<div style="font-size:11px;color:var(--text2);margin-bottom:4px;">持久力</div>' +
     '<div class="timer-result-time">' +
-    fmtTimeSec(timerElapsed) +
-    " 秒</div>" +
+    total +
+    " 秒" +
+    "</div>" +
+    '<div class="timer-result-time-min">' +
+    "(" +
+    minutesAndSeconds +
+    ")" +
+    "</div>" +
     '<div style="font-size:12px;color:var(--text2);margin-top:6px;">' +
     timerDeck.name +
     "</div>" +

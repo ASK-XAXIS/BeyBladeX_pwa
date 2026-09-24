@@ -1,3 +1,8 @@
+/**
+ * app.js
+ * アプリの起動処理のみ
+ */
+
 renderHome();
 showScreen("home");
 

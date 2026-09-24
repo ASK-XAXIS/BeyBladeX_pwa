@@ -451,6 +451,16 @@ function fmtTimeDuration(ms) {
   return "持久力 " + fmtTimeSec(ms) + " 秒";
 }
 
+function fmtTimeMinAndSec(sec) {
+  var minute = (sec / 60).toFixed(0);
+  if (minute < 1) {
+    minute = 0;
+    return "1分未満";
+  }
+  var second = (sec % 60).toFixed(0);
+  return minute + " 分" + second + " 秒";
+}
+
 function getAllNames(d) {
   return [
     d.blade,
