@@ -104,7 +104,6 @@ function renderSubTabs() {
 }
 var partsSearchQuery = "";
 
-
 /* フィルタリングされたパーツの取得 */
 function getFiltered() {
   var q = normalizeStr(partsSearchQuery.trim());
@@ -466,7 +465,6 @@ function getPartRecords(partName) {
   });
 }
 
-
 /* ベストコンボパーツのHTMLを生成 */
 function getBestComboHtml(p, records) {
   // このパーツと一緒に使われた他カテゴリのパーツごとに勝率集計
@@ -749,7 +747,7 @@ function saveEditPart() {
   p.img = editThumbData;
   p.memo = document.getElementById("edit-memo-inp").value.trim();
   saveParts();
-  showToast("保存完了！");
+  showToast("保存完了！", "ok");
   closeModal("modal-edit-part");
   renderParts();
 }
@@ -876,7 +874,6 @@ function mkComboRow(i) {
     "</div>"
   );
 }
-
 
 /* パーツ追加モーダルを開く */
 function openAddPart() {
@@ -1038,8 +1035,6 @@ function setAddPickerCxPat(n) {
   document.getElementById("apcxp-4").classList.toggle("active", n === 4);
   renderAddPickerMain();
 }
-
-
 
 /* パーツ追加ピッカーのメインエリアを描画 */
 function renderAddPickerMain() {
