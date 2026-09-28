@@ -296,24 +296,8 @@ var thumbTarget = null,
   thumbMap = {},
   cxAddPat = 3;
 var rowCount = { bxux: 1, ratchet: 1, bit: 1, combo: 1 };
-var deckMode = "owned",
-  deckBladeLine = "bx",
+var deckBladeLine = "bx",
   deckCxPat = 3;
-var DS = {
-  bladeLine: null,
-  blade: null,
-  lock: null,
-  main: null,
-  assist: null,
-  metal: null,
-  over: null,
-  lock4: null,
-  assist4: null,
-  ratchet: null,
-  bit: null,
-  combo: null,
-};
-var userEditedName = false;
 //画面切り替え時の一時保留用変数
 var pendingNavTarget = null;
 

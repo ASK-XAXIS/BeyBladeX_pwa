@@ -136,7 +136,16 @@ npx http-server .
 ```
 BeyBladeX_pwa/
 ├── index.html        # メイン画面
-├── app.js             # アプリケーションロジック
+├── app.js             # 起動処理(初期描画・Service Worker登録)
+├── js/
+│   ├── globals.js     # グローバル変数・パーツデータ・保存関数・共通処理
+│   ├── ui.js          # 画面切替・テーマ・ホーム画面
+│   ├── parts.js       # パーツ管理
+│   ├── decks.js       # デッキビルダー
+│   ├── battle.js      # 対戦モード
+│   ├── timer.js       # 計測モード
+│   └── player-card.js # プレイヤーカード・QRコード共有
+├── jsQR.js            # QRコード読み取りライブラリ
 ├── style.css          # スタイル
 ├── sw.js              # Service Worker(オフライン対応)
 ├── manifest.json      # PWAマニフェスト
@@ -144,7 +153,8 @@ BeyBladeX_pwa/
 ├── icon-192.png        # Android用アイコン
 ├── icon-512.png        # 高解像度アイコン
 ├── _headers            # Cloudflare Pages設定
-└── _redirects           # Cloudflare Pages設定
+├── _redirects           # Cloudflare Pages設定
+└── docs/                # スクリーンショット
 ```
 
 ## 今後の展望
